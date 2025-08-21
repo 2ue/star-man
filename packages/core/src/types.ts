@@ -63,6 +63,8 @@ export interface SyncResult {
   updated: number;
   unstarred: number;
   total: number;
+  /** Total number of records in the database table, including unstarred */
+  dbTotal: number;
 }
 
 export interface GetReposOptions {

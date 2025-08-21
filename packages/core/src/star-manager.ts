@@ -24,7 +24,7 @@ export class StarManager {
 
     try {
       onProgress?.({ current: 0, total: 0, repo: '', action: '正在获取 GitHub starred 仓库...' });
-      
+
       // 总是获取 GitHub 上的全部 starred 仓库（集合A）
       const repos = await this.github.getAllStarredRepos((current, page) => {
         onProgress?.({ current, total: 0, repo: '', action: `正在获取第 ${page} 页，已获取 ${current} 个仓库...` });
@@ -42,22 +42,22 @@ export class StarManager {
         where: { isStarred: true },
         select: { fullName: true }
       });
-      
+
       const existingStarredSet = new Set(
         existingStarredRepos.map((repo: any) => repo.fullName)
       );
 
       // GitHub 上当前 starred 的仓库（集合A）
       const currentStarredSet = new Set(repos.map(repo => repo.full_name));
-      
+
       // 计算差集
       const newStarredRepos = repos.filter(repo => !existingStarredSet.has(repo.full_name)); // A - B
       const unstarredRepoNames = Array.from(existingStarredSet).filter(fullName => !currentStarredSet.has(fullName)); // B - A
       const unchangedCount = repos.length - newStarredRepos.length; // A ∩ B
 
-      onProgress?.({ 
-        current: 0, 
-        total: newStarredRepos.length + unstarredRepoNames.length, 
+      onProgress?.({
+        current: 0,
+        total: newStarredRepos.length + unstarredRepoNames.length,
         repo: '',
         action: `需要处理：${newStarredRepos.length} 个新增，${unstarredRepoNames.length} 个取消，${unchangedCount} 个无变化`
       });
@@ -142,9 +142,9 @@ export class StarManager {
           processedCount += batch.length;
           added += batch.length;
 
-          onProgress?.({ 
-            current: processedCount, 
-            total: newStarredRepos.length + unstarredRepoNames.length, 
+          onProgress?.({
+            current: processedCount,
+            total: newStarredRepos.length + unstarredRepoNames.length,
             repo: batch[batch.length - 1].full_name,
             action: `已新增 ${processedCount}/${newStarredRepos.length} 个仓库`
           });
@@ -153,10 +153,10 @@ export class StarManager {
 
       // 批量更新取消 starred 的仓库（B - A）
       if (unstarredRepoNames.length > 0) {
-        const updateOperations = unstarredRepoNames.map(fullName => 
+        const updateOperations = unstarredRepoNames.map(fullName =>
           prisma.starredRepo.updateMany({
             where: { fullName },
-            data: { 
+            data: {
               isStarred: false,
               syncAt: startTime
             }
@@ -166,9 +166,9 @@ export class StarManager {
         await prisma.$transaction(updateOperations);
         unstarred = unstarredRepoNames.length;
 
-        onProgress?.({ 
-          current: newStarredRepos.length + unstarredRepoNames.length, 
-          total: newStarredRepos.length + unstarredRepoNames.length, 
+        onProgress?.({
+          current: newStarredRepos.length + unstarredRepoNames.length,
+          total: newStarredRepos.length + unstarredRepoNames.length,
           repo: '',
           action: `已标记 ${unstarred} 个仓库为取消 star`
         });
@@ -179,6 +179,9 @@ export class StarManager {
       const total = await prisma.starredRepo.count({
         where: { isStarred: true }
       });
+
+      // Total number of records in database, regardless of isStarred
+      const dbTotal = await prisma.starredRepo.count();
 
       // 记录同步历史
       await prisma.syncHistory.create({
@@ -192,14 +195,14 @@ export class StarManager {
         }
       });
 
-      onProgress?.({ 
-        current: totalRepos, 
-        total: totalRepos, 
+      onProgress?.({
+        current: totalRepos,
+        total: totalRepos,
         repo: '',
         action: '同步完成！'
       });
 
-      return { added, updated, unstarred, total };
+      return { added, updated, unstarred, total, dbTotal };
 
     } catch (error) {
       // 记录失败的同步
@@ -230,7 +233,7 @@ export class StarManager {
     } = options;
 
     const where: any = {};
-    
+
     // 默认只显示 starred 的仓库，除非明确指定包含 unstarred
     if (!options.includeUnstarred) {
       where.isStarred = true;
@@ -310,7 +313,7 @@ export class StarManager {
     }
 
     await this.github.setRepoTopics(repo.ownerLogin, repo.name, topics);
-    
+
     // 更新本地数据库
     await prisma.starredRepo.update({
       where: { id: repoId },
@@ -335,11 +338,11 @@ export class StarManager {
 
     // 在 GitHub 上取消 star
     await this.github.unstarRepo(repo.ownerLogin, repo.name);
-    
+
     // 更新本地数据库
     await prisma.starredRepo.update({
       where: { id: repoId },
-      data: { 
+      data: {
         isStarred: false,
         syncAt: new Date()
       }
@@ -382,7 +385,7 @@ export class StarManager {
 
   async getStats(): Promise<StatsResult> {
     const prisma = this.db.getPrisma();
-    
+
     const [totalRepos, currentlyStarred, unstarred, lastSync] = await Promise.all([
       prisma.starredRepo.count(),
       prisma.starredRepo.count({ where: { isStarred: true } }),
@@ -419,7 +422,7 @@ export class StarManager {
     const prisma = this.db.getPrisma();
     const result = await prisma.starredRepo.groupBy({
       by: ['language'],
-      where: { 
+      where: {
         isStarred: true,
         language: { not: null }
       },
