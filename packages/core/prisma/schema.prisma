@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../dist/generated/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model StarredRepo {
+  id               Int      @id
+  nodeId           String   @map("node_id")
+  name             String
+  fullName         String   @unique @map("full_name")
+  ownerLogin       String   @map("owner_login")
+  ownerId          Int      @map("owner_id")
+  ownerAvatarUrl   String?  @map("owner_avatar_url")
+  description      String?
+  htmlUrl          String   @map("html_url")
+  cloneUrl         String   @map("clone_url")
+  sshUrl           String   @map("ssh_url")
+  language         String?
+  stargazersCount  Int      @default(0) @map("stargazers_count")
+  forksCount       Int      @default(0) @map("forks_count")
+  size             Int      @default(0)
+  defaultBranch    String   @default("main") @map("default_branch")
+  topics           String?  // JSON string
+  createdAt        DateTime @map("created_at")
+  updatedAt        DateTime @map("updated_at")
+  pushedAt         DateTime? @map("pushed_at")
+  starredAt        DateTime @map("starred_at")
+  archived         Boolean  @default(false)
+  disabled         Boolean  @default(false)
+  private          Boolean  @default(false)
+  fork             Boolean  @default(false)
+  isStarred        Boolean  @default(true) @map("is_starred")
+  tags             String?  // JSON string
+  category         String?
+  syncAt           DateTime @map("sync_at")
+
+  @@map("starred_repos")
+  @@index([ownerLogin])
+  @@index([language])
+  @@index([isStarred])
+  @@index([category])
+  @@index([syncAt])
+}
+
+model SyncHistory {
+  id            Int      @id @default(autoincrement())
+  syncAt        DateTime @map("sync_at")
+  added         Int      @default(0)
+  updated       Int      @default(0)
+  unstarred     Int      @default(0)
+  total         Int      @default(0)
+  errorMessage  String?  @map("error_message")
+  success       Boolean  @default(true)
+
+  @@map("sync_history")
+}
