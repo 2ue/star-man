@@ -34,7 +34,8 @@ export function createSyncCommand(): Command {
         console.log(`新增仓库: ${chalk.yellow(result.added)}`);
         console.log(`更新仓库: ${chalk.yellow(result.updated)}`);
         console.log(`标记为取消 star: ${chalk.yellow(result.unstarred)}`);
-        console.log(`总处理数: ${chalk.yellow(result.total)}`);
+        console.log(`当前 Star 数（已标记为 Star）: ${chalk.yellow(result.total)}`);
+        console.log(`数据库记录总数（含已取消 Star）: ${chalk.yellow(result.dbTotal)}`);
 
       } catch (error) {
         console.error(chalk.red('同步失败:'), error instanceof Error ? error.message : error);
