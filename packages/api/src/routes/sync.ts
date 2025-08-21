@@ -21,7 +21,7 @@ export function createSyncRouter(starManager: StarManager): Router {
       res.json({
         success: true,
         data: result,
-        message: `同步完成: 新增 ${result.added}, 更新 ${result.updated}, 取消 star ${result.unstarred}`,
+        message: `同步完成: 新增 ${result.added}, 取消 star ${result.unstarred}`,
       });
     } catch (error) {
       res.status(500).json({

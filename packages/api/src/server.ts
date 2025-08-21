@@ -112,7 +112,7 @@ async function startServer() {
     // 加载配置
     const config = loadConfig();
     validateConfig(config);
-    
+
     // 检查 API 配置
     if (!config.api || !config.api.port) {
       console.error('\n❌ API 服务启动失败:');
@@ -121,10 +121,10 @@ async function startServer() {
       console.error('');
       process.exit(1);
     }
-    
+
     // 显示当前配置
     displayConfig(config);
-    
+
     const PORT = config.api.port;
     const HOST = config.api.host; // 可以为 undefined，这时 Express 会使用默认值
 
@@ -171,7 +171,7 @@ async function startServer() {
     });
 
     // 错误处理
-    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
       console.error('服务器错误:', err);
       res.status(500).json({
         success: false,

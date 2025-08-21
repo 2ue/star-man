@@ -26,10 +26,10 @@ export class GitHubService {
     let page = 1;
     const perPage = 100;
 
-    while (true) {
+    for (; ;) {
       try {
         onProgress?.(allRepos.length, page);
-        
+
         const { data } = await this.octokit.rest.activity.listReposStarredByUser({
           username,
           per_page: perPage,
@@ -69,7 +69,7 @@ export class GitHubService {
     let page = 1;
     const perPage = 100;
 
-    while (true) {
+    for (; ;) {
       try {
         const { data } = await this.octokit.rest.activity.listReposStarredByUser({
           username,
@@ -88,7 +88,7 @@ export class GitHubService {
         }));
 
         // 过滤出指定时间之后的仓库
-        const newRepos = repos.filter(repo => 
+        const newRepos = repos.filter(repo =>
           new Date(repo.starred_at!) > new Date(since)
         );
 

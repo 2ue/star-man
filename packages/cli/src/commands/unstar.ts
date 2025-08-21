@@ -1,10 +1,11 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { StarManager, loadConfig } from '@star-man/core';
+import * as readline from 'readline';
 
 export function createUnstarCommand(): Command {
   const command = new Command('unstar');
-  
+
   command
     .description('取消 star 仓库')
     .option('-i, --ids <ids>', '仓库 ID 列表，用逗号分隔')
@@ -19,8 +20,7 @@ export function createUnstarCommand(): Command {
         if (options.batch) {
           // 批量模式：从标准输入读取
           console.log(chalk.blue('批量取消 star 模式，请输入仓库 ID 或全名，每行一个，输入完成后按 Ctrl+D:'));
-          
-          const readline = require('readline');
+
           const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
@@ -55,7 +55,7 @@ export function createUnstarCommand(): Command {
 
           console.log(chalk.blue(`开始取消 ${ids.length} 个仓库的 star...`));
           const result = await starManager.unstarRepos(ids);
-          
+
           console.log(chalk.green(`✅ 成功取消 ${result.success} 个仓库的 star`));
           if (result.failed.length > 0) {
             console.log(chalk.red(`❌ 失败 ${result.failed.length} 个:`));

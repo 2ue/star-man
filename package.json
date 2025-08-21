@@ -6,7 +6,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "cli": "node packages/cli/dist/bin.js",
     "api": "node packages/api/dist/server.js",
     "dev:cli": "pnpm --filter @star-man/cli dev",
