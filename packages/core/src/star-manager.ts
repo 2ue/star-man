@@ -18,7 +18,7 @@ export class StarManager {
     await this.db.initialize();
   }
 
-  async syncStarredRepos(incremental: boolean = true, onProgress?: (progress: { current: number; total: number; repo: string; action: string }) => void): Promise<SyncResult> {
+  async syncStarredRepos(_incremental: boolean = true, onProgress?: (progress: { current: number; total: number; repo: string; action: string }) => void): Promise<SyncResult> {
     const prisma = this.db.getPrisma();
     const startTime = new Date();
 
@@ -34,7 +34,7 @@ export class StarManager {
       onProgress?.({ current: 0, total: totalRepos, repo: '', action: `获取到 ${totalRepos} 个仓库，开始同步...` });
 
       let added = 0;
-      let updated = 0;
+      const updated = 0;
       let unstarred = 0;
 
       // 获取数据库中当前 starred 的仓库（集合B）
@@ -202,7 +202,7 @@ export class StarManager {
         action: '同步完成！'
       });
 
-      return { added, updated, unstarred, total, dbTotal };
+      return { added, unstarred, total, dbTotal };
 
     } catch (error) {
       // 记录失败的同步
@@ -350,7 +350,6 @@ export class StarManager {
   }
 
   async unstarRepos(repoIds: number[]): Promise<{ success: number; failed: Array<{ id: number; error: string }> }> {
-    const prisma = this.db.getPrisma();
     let success = 0;
     const failed: Array<{ id: number; error: string }> = [];
 

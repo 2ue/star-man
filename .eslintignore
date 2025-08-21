@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+out/
+lib/
+coverage/
+.next/
+.turbo/
+.vercel/
+packages/*/dist/
+packages/*/build/
+packages/*/out/ 

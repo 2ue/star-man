@@ -60,7 +60,6 @@ export interface RepoAnalysis {
 
 export interface SyncResult {
   added: number;
-  updated: number;
   unstarred: number;
   total: number;
   /** Total number of records in the database table, including unstarred */
