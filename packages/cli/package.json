@@ -1,0 +1,37 @@
+{
+  "name": "@star-man/cli",
+  "version": "1.0.0",
+  "description": "CLI for star-man GitHub star management",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "star-man": "./dist/bin.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "github",
+    "star",
+    "management",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@star-man/core": "workspace:*",
+    "@types/cli-table": "^0.3.4",
+    "chalk": "^5.3.0",
+    "cli-table": "^0.3.11",
+    "commander": "^11.0.0",
+    "inquirer": "^9.2.10",
+    "ora": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "typescript": "^5.2.2"
+  }
+}
