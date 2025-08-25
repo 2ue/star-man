@@ -68,6 +68,28 @@ export interface RepoQuery {
   search?: string
   limit?: number
   offset?: number
+
+  // 新增字段
+  // 时间筛选
+  pushedAfter?: string      // 最后活跃时间范围开始
+  pushedBefore?: string     // 最后活跃时间范围结束
+  updatedAfter?: string     // 元数据更新时间范围开始
+  updatedBefore?: string    // 元数据更新时间范围结束
+
+  // 数量筛选
+  minStars?: number         // 最小Star数
+  maxStars?: number         // 最大Star数
+
+  // 排序
+  sort?: 'relevance' | 'stars' | 'forks' | 'pushed' | 'updated' | 'created'
+  order?: 'asc' | 'desc'
+}
+
+// 前端筛选状态接口，包含临时的UI字段
+export interface RepoFilters extends RepoQuery {
+  // 临时的UI字段，用于时间范围选择
+  pushedTimeRange?: string  // 最后活跃时间范围选择
+  updatedTimeRange?: string // 元数据更新时间范围选择
 }
 
 // 同步类型

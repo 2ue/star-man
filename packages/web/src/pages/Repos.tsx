@@ -2,37 +2,84 @@ import { Search, Grid, List, Star, GitFork, ExternalLink, Tag, FolderOpen, Slide
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchRepos } from '../lib/api'
-import type { RepoQuery } from '../types/api'
+import type { RepoQuery, RepoFilters } from '../types/api'
 import Pagination from '../components/Pagination'
 
 export default function Repos() {
-  const [filters, setFilters] = useState<RepoQuery>({
+  const [filters, setFilters] = useState<RepoFilters>({
     limit: 20,
     offset: 0,
+    // 新增筛选状态
+    minStars: undefined,
+    maxStars: undefined,
+    pushedTimeRange: undefined,
+    updatedTimeRange: undefined,
+    sort: 'relevance',
+    order: 'desc'
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
+  // 构建API查询参数
+  const apiFilters: RepoQuery = {
+    ...filters,
+    search: searchTerm || undefined
+  }
+
   const { data: reposData, isLoading, error } = useQuery({
-    queryKey: ['repos', filters],
-    queryFn: () => fetchRepos(filters),
+    queryKey: ['repos', apiFilters],
+    queryFn: () => fetchRepos(apiFilters),
     keepPreviousData: true,
   })
 
+  // 时间范围转换函数
+  const getTimeRangeDates = (timeRange: string) => {
+    const now = new Date()
+    switch (timeRange) {
+      case '1w':
+        return { start: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), end: now }
+      case '1m':
+        return { start: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), end: now }
+      case '3m':
+        return { start: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000), end: now }
+      case '6m':
+        return { start: new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000), end: now }
+      case '1y':
+        return { start: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000), end: now }
+      default:
+        return { start: undefined, end: undefined }
+    }
+  }
+
   const handleSearch = () => {
-    setFilters(prev => ({
-      ...prev,
-      search: searchTerm || undefined,
-      offset: 0,
-    }))
+    const timeRanges = getTimeRangeDates(filters.pushedTimeRange || '')
+    const updateTimeRanges = getTimeRangeDates(filters.updatedTimeRange || '')
+
+    const searchFilters = {
+      ...filters,
+      pushedAfter: timeRanges.start?.toISOString(),
+      pushedBefore: timeRanges.end?.toISOString(),
+      updatedAfter: updateTimeRanges.start?.toISOString(),
+      updatedBefore: updateTimeRanges.end?.toISOString(),
+      offset: 0 // 重置到第一页
+    }
+
+    setFilters(searchFilters)
   }
 
   const handleReset = () => {
+    setSearchTerm('')
     setFilters({
       limit: 20,
       offset: 0,
+      // 重置所有筛选条件
+      minStars: undefined,
+      maxStars: undefined,
+      pushedTimeRange: undefined,
+      updatedTimeRange: undefined,
+      sort: 'relevance',
+      order: 'desc'
     })
-    setSearchTerm('')
   }
 
   const handlePageChange = (newOffset: number) => {
@@ -128,6 +175,61 @@ export default function Repos() {
                 onChange={(e) => setFilters(prev => ({ ...prev, tags: e.target.value || undefined }))}
               />
             </div>
+
+            {/* Star数量范围 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">Star数量范围</label>
+              <div className="flex gap-2">
+                <input
+                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  placeholder="最小Star数"
+                  type="number"
+                  min="0"
+                  value={filters.minStars || ''}
+                  onChange={(e) => setFilters(prev => ({ ...prev, minStars: e.target.value ? parseInt(e.target.value) : undefined }))}
+                />
+                <input
+                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  placeholder="最大Star数"
+                  type="number"
+                  min="0"
+                  value={filters.maxStars || ''}
+                  onChange={(e) => setFilters(prev => ({ ...prev, maxStars: e.target.value ? parseInt(e.target.value) : undefined }))}
+                />
+              </div>
+            </div>
+
+            {/* 最后活跃时间 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">最后活跃时间</label>
+              <select
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm"
+                value={filters.pushedTimeRange || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, pushedTimeRange: e.target.value || undefined }))}
+              >
+                <option value="">全部时间</option>
+                <option value="1w">最近一周</option>
+                <option value="1m">最近一月</option>
+                <option value="3m">最近三月</option>
+                <option value="6m">最近半年</option>
+                <option value="1y">最近一年</option>
+              </select>
+            </div>
+
+            {/* 元数据更新时间 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">元数据更新时间</label>
+              <select
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm"
+                value={filters.updatedTimeRange || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, updatedTimeRange: e.target.value || undefined }))}
+              >
+                <option value="">全部时间</option>
+                <option value="1w">最近一周</option>
+                <option value="1m">最近一月</option>
+                <option value="3m">最近三月</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex items-center justify-between">
@@ -148,27 +250,78 @@ export default function Repos() {
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600">视图:</span>
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
-                    }`}
+            {/* 新增排序控件 */}
+            <div className="flex items-center gap-4">
+              {/* 排序方式 */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">排序:</span>
+                <select
+                  className="px-3 py-2 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+                  value={filters.sort || 'relevance'}
+                  onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value as any }))}
                 >
-                  <Grid size={14} />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-md transition-colors ${viewMode === 'list'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                >
-                  <List size={14} />
-                </button>
+                  <option value="relevance">相关度</option>
+                  <option value="stars">Star数</option>
+                  <option value="forks">Fork数</option>
+                  <option value="pushed">最后活跃</option>
+                  <option value="updated">元数据更新</option>
+                  <option value="created">创建时间</option>
+                </select>
+              </div>
+
+              {/* 排序方向 */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">方向:</span>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, order: 'asc' }))}
+                    className={`p-1.5 rounded-md transition-colors ${filters.order === 'asc'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                      }`}
+                    title="升序"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, order: 'desc' }))}
+                    className={`p-1.5 rounded-md transition-colors ${filters.order === 'desc'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                      }`}
+                    title="降序"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600">视图:</span>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                  >
+                    <Grid size={14} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-1.5 rounded-md transition-colors ${viewMode === 'list'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                  >
+                    <List size={14} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
