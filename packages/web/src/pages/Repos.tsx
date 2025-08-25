@@ -28,7 +28,10 @@ export default function Repos() {
 
   const { data: reposData, isLoading, error } = useQuery({
     queryKey: ['repos', apiFilters],
-    queryFn: () => fetchRepos(apiFilters),
+    queryFn: () => {
+      console.log('🚀 API调用参数:', apiFilters)
+      return fetchRepos(apiFilters)
+    },
     keepPreviousData: true,
   })
 
@@ -63,6 +66,17 @@ export default function Repos() {
       updatedBefore: updateTimeRanges.end?.toISOString(),
       offset: 0 // 重置到第一页
     }
+
+    // 调试：输出实际的API查询参数
+    console.log('🔍 搜索参数:', searchFilters)
+    console.log('📅 时间范围转换:', {
+      pushedTimeRange: filters.pushedTimeRange,
+      pushedAfter: timeRanges.start?.toISOString(),
+      pushedBefore: timeRanges.end?.toISOString(),
+      updatedTimeRange: filters.updatedTimeRange,
+      updatedAfter: updateTimeRanges.start?.toISOString(),
+      updatedBefore: updateTimeRanges.end?.toISOString()
+    })
 
     setFilters(searchFilters)
   }
