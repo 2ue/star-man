@@ -37,13 +37,22 @@ export default function SyncPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    try {
+      const date = new Date(dateString)
+      // 检查日期是否有效
+      if (isNaN(date.getTime())) {
+        return '时间未知'
+      }
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    } catch (error) {
+      return '时间未知'
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -55,6 +64,29 @@ export default function SyncPage() {
       default:
         return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400'
     }
+  }
+
+  const getStatusText = (status: string, record: any) => {
+    // 如果状态是失败但有数据，可能是部分成功
+    if (status === 'failed' && record.added > 0) {
+      return '部分成功'
+    }
+    switch (status) {
+      case 'success':
+        return '成功'
+      case 'failed':
+        return '失败'
+      default:
+        return '未知'
+    }
+  }
+
+  const getStatusColorWithData = (status: string, record: any) => {
+    // 如果状态是失败但有数据，显示为警告色
+    if (status === 'failed' && record.added > 0) {
+      return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400'
+    }
+    return getStatusColor(status)
   }
 
   const getTypeColor = (type: string) => {
@@ -162,8 +194,8 @@ export default function SyncPage() {
 
                 <button
                   className={`btn w-full ${isSyncing
-                      ? 'btn-disabled'
-                      : 'btn-gradient-primary'
+                    ? 'btn-disabled'
+                    : 'btn-gradient-primary'
                     }`}
                   onClick={handleSync}
                   disabled={isSyncing}
@@ -209,13 +241,13 @@ export default function SyncPage() {
                   <div key={record.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorWithData(record.status, record)}`}>
                           {record.status === 'success' ? (
                             <CheckCircle size={10} className="inline mr-1" />
                           ) : (
                             <XCircle size={10} className="inline mr-1" />
                           )}
-                          {record.status === 'success' ? '成功' : '失败'}
+                          {getStatusText(record.status, record)}
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(record.type)}`}>
                           {record.type === 'incremental' ? '增量' : '全量'}
