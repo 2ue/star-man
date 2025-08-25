@@ -146,7 +146,10 @@ export default function Dashboard() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <ListTree size={16} className="text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">分类统计</h2>
+              <h2 className="text-lg font-semibold text-gray-800">分类统计</h2>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                共 {stats?.categories?.length || 0} 个分类
+              </span>
             </div>
             <div className="space-y-3">
               {stats?.categories?.slice(0, 6).map((cat, index) => (
@@ -158,7 +161,7 @@ export default function Dashboard() {
                           index === 3 ? 'bg-purple-500' :
                             index === 4 ? 'bg-pink-500' : 'bg-gray-400'
                       }`} />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-700">
                       {cat.category || '未分类'}
                     </span>
                   </div>
@@ -167,6 +170,20 @@ export default function Dashboard() {
                   </span>
                 </div>
               ))}
+
+              {/* 显示更多分类的提示 */}
+              {stats?.categories && stats.categories.length > 6 && (
+                <div className="pt-2 border-t border-gray-100">
+                  <div className="text-center">
+                    <span className="text-xs text-gray-500">
+                      还有 {stats.categories.length - 6} 个分类未显示
+                    </span>
+                    <div className="text-xs text-blue-600 mt-1">
+                      完整数据请查看仓库管理页面
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -177,7 +194,10 @@ export default function Dashboard() {
               <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
                 <Tag size={16} className="text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">语言统计</h2>
+              <h2 className="text-lg font-semibold text-gray-800">语言统计</h2>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                共 {stats?.languages?.length || 0} 种语言
+              </span>
             </div>
             <div className="space-y-3">
               {stats?.languages?.slice(0, 6).map((lang, index) => (
@@ -189,7 +209,7 @@ export default function Dashboard() {
                           index === 3 ? 'bg-green-500' :
                             index === 4 ? 'bg-purple-500' : 'bg-gray-400'
                       }`} />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-700">
                       {lang.language || '未知'}
                     </span>
                   </div>
@@ -198,6 +218,20 @@ export default function Dashboard() {
                   </span>
                 </div>
               ))}
+
+              {/* 显示更多语言的提示 */}
+              {stats?.languages && stats.languages.length > 6 && (
+                <div className="pt-2 border-t border-gray-100">
+                  <div className="text-center">
+                    <span className="text-xs text-gray-500">
+                      还有 {stats.languages.length - 6} 种语言未显示
+                    </span>
+                    <div className="text-xs text-blue-600 mt-1">
+                      完整数据请查看仓库管理页面
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
