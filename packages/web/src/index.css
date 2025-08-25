@@ -25,11 +25,11 @@ html, body, #root {
 
 /* 现代化卡片样式 - 更紧凑 */
 .card-modern {
-  @apply bg-white/90 dark:bg-gray-800 border border-white/30 dark:border-gray-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
+  @apply bg-white/90 border border-white/30 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
 }
 
 .card-glass {
-  @apply bg-white/20 dark:bg-gray-800/80 backdrop-blur-md border border-white/30 dark:border-gray-700 rounded-xl shadow-lg;
+  @apply bg-white/20 backdrop-blur-md border border-white/30 rounded-xl shadow-lg;
 }
 
 /* 渐变按钮 */
@@ -118,14 +118,14 @@ html, body, #root {
   animation: fadeIn 0.4s ease-out;
 }
 
-/* 现代化输入框 - 暗色模式支持 */
+/* 现代化输入框 */
 .input-modern {
-  @apply bg-white/80 dark:bg-gray-700 border border-white/40 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 dark:focus:ring-blue-400/50 dark:focus:border-blue-400 transition-all duration-200 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400;
+  @apply bg-white/80 border border-white/40 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500;
 }
 
-/* 现代化徽章 - 暗色模式支持 */
+/* 现代化徽章 */
 .badge-modern {
-  @apply px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 dark:from-blue-400/20 dark:to-purple-400/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300;
+  @apply px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700;
 }
 
 /* 响应式网格 - 更紧凑 */
@@ -134,9 +134,9 @@ html, body, #root {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-/* 玻璃态效果 - 暗色模式支持 */
+/* 玻璃态效果 */
 .glass-effect {
-  @apply bg-white/20 dark:bg-gray-800/80 backdrop-blur-md border border-white/30 dark:border-gray-700;
+  @apply bg-white/20 backdrop-blur-md border border-white/30;
 }
 
 /* 悬停效果 */
@@ -176,97 +176,4 @@ html, body, #root {
 
 .card-large {
   @apply p-6;
-}
-
-/* 暗色模式下的特殊样式 */
-.dark .card-modern {
-  @apply bg-gray-800 border-gray-700;
-}
-
-.dark .input-modern {
-  @apply bg-gray-700 border-gray-600 text-gray-100;
-}
-
-.dark .badge-modern {
-  @apply bg-gradient-to-r from-blue-400/20 to-purple-400/20 border-blue-400/30 text-blue-300;
-}
-
-/* 暗色模式下的背景层次 */
-.dark .bg-gray-50 {
-  @apply bg-gray-800;
-}
-
-.dark .bg-gray-100 {
-  @apply bg-gray-700;
-}
-
-.dark .bg-gray-200 {
-  @apply bg-gray-600;
-}
-
-.dark .border-gray-200 {
-  @apply border-gray-700;
-}
-
-.dark .border-gray-300 {
-  @apply border-gray-600;
-}
-
-/* 暗色模式下的文字颜色优化 */
-.dark .text-gray-600 {
-  color: rgb(209 213 219); /* text-gray-300 */
-}
-
-.dark .text-gray-500 {
-  color: rgb(156 163 175); /* text-gray-400 */
-}
-
-.dark .text-gray-400 {
-  color: rgb(156 163 175); /* text-gray-400 */
-}
-
-.dark .text-gray-700 {
-  color: rgb(229 231 235); /* text-gray-200 */
-}
-
-.dark .text-gray-800 {
-  color: rgb(243 244 246); /* text-gray-100 */
-}
-
-.dark .text-gray-900 {
-  color: rgb(255 255 255); /* text-white */
-}
-
-/* 暗色模式下的标题文字 */
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-  color: rgb(255 255 255); /* text-white */
-}
-
-/* 暗色模式下的段落文字 */
-.dark p {
-  color: rgb(229 231 235); /* text-gray-200 */
-}
-
-/* 暗色模式下的标签文字 */
-.dark label {
-  color: rgb(229 231 235); /* text-gray-200 */
-}
-
-/* 暗色模式下的链接文字 */
-.dark a:not(.text-gradient) {
-  color: rgb(229 231 235); /* text-gray-200 */
-}
-
-.dark a:not(.text-gradient):hover {
-  color: rgb(255 255 255); /* text-white */
-}
-
-/* 暗色模式下的按钮文字 */
-.dark .btn:not(.btn-gradient-primary):not(.btn-gradient-secondary):not(.btn-gradient-success) {
-  color: rgb(229 231 235); /* text-gray-200 */
-}
-
-/* 暗色模式下的徽章文字 */
-.dark .badge:not(.badge-modern) {
-  color: rgb(229 231 235); /* text-gray-200 */
 }
