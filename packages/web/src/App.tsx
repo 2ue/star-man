@@ -7,7 +7,7 @@ export default function App() {
   const location = useLocation()
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'dark')
+    setTheme(prev => prev === 'light' ? 'dark' : 'light')
   }
 
   const isActive = (path: string) => location.pathname === path
@@ -15,15 +15,21 @@ export default function App() {
   return (
     <div className={`min-h-screen transition-colors duration-300 ${theme === 'light'
         ? 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-        : 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'
+        : 'bg-gray-900'
       }`}>
       <div className="drawer lg:drawer-open">
         <input id="app-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
           {/* 现代化顶部导航栏 - 更紧凑 */}
-          <div className="navbar glass-effect border-b border-white/20 dark:border-gray-700/20 h-14 min-h-14 px-4 backdrop-blur-md">
+          <div className={`navbar border-b transition-colors duration-300 ${theme === 'light'
+              ? 'bg-white/80 backdrop-blur-md border-white/20'
+              : 'bg-gray-800 border-gray-700'
+            } h-14 min-h-14 px-4 backdrop-blur-md`}>
             <div className="flex items-center gap-3">
-              <label htmlFor="app-drawer" className="btn btn-ghost btn-sm lg:hidden glass-effect">
+              <label htmlFor="app-drawer" className={`btn btn-ghost btn-sm lg:hidden ${theme === 'light'
+                  ? 'bg-white/50 hover:bg-white/70'
+                  : 'bg-gray-700 hover:bg-gray-600'
+                }`}>
                 <Menu size={16} />
               </label>
               <div className="flex items-center gap-2">
@@ -36,12 +42,18 @@ export default function App() {
             <div className="flex-1" />
             <div className="flex items-center gap-2">
               <button
-                className="btn btn-ghost btn-sm glass-effect"
+                className={`btn btn-ghost btn-sm ${theme === 'light'
+                    ? 'bg-white/50 hover:bg-white/70'
+                    : 'bg-gray-700 hover:bg-gray-600'
+                  }`}
                 onClick={toggleTheme}
               >
                 {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
               </button>
-              <button className="btn btn-ghost btn-sm glass-effect">
+              <button className={`btn btn-ghost btn-sm ${theme === 'light'
+                  ? 'bg-white/50 hover:bg-white/70'
+                  : 'bg-gray-700 hover:bg-gray-600'
+                }`}>
                 <Settings size={14} />
               </button>
             </div>
@@ -56,7 +68,10 @@ export default function App() {
         {/* 现代化侧边栏 - 更紧凑 */}
         <aside className="drawer-side">
           <label htmlFor="app-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-          <div className="glass-effect w-64 min-h-full border-r border-white/20 dark:border-gray-700/20 backdrop-blur-md">
+          <div className={`w-64 min-h-full border-r transition-colors duration-300 ${theme === 'light'
+              ? 'bg-white/80 backdrop-blur-md border-white/20'
+              : 'bg-gray-800 border-gray-700'
+            } backdrop-blur-md`}>
             <div className="p-4">
               <div className="mb-6">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-2">
@@ -75,7 +90,7 @@ export default function App() {
                   to="/"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/')
                       ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700'
                     }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isActive('/') ? 'bg-blue-500' : 'bg-gray-400'
@@ -87,7 +102,7 @@ export default function App() {
                   to="/repos"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/repos')
                       ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700'
                     }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isActive('/repos') ? 'bg-blue-500' : 'bg-gray-400'
@@ -99,7 +114,7 @@ export default function App() {
                   to="/sync"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/sync')
                       ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-white/10'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700'
                     }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isActive('/sync') ? 'bg-blue-500' : 'bg-gray-400'
