@@ -132,10 +132,10 @@ export default function Repos() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
-                className="btn-gradient-primary px-6 py-2.5 text-sm font-medium"
+                className="px-6 py-2.5 text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-md transition-all duration-200 flex items-center gap-2"
                 onClick={handleSearch}
               >
-                <Search size={16} className="mr-2" />
+                <Search size={16} />
                 查询
               </button>
               <button
@@ -383,8 +383,8 @@ export default function Repos() {
                               <button
                                 key={i}
                                 className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 ${i === currentPage
-                                    ? 'bg-blue-500 text-white shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                                  ? 'bg-blue-500 text-white shadow-sm'
+                                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                   }`}
                                 onClick={() => handlePageChange((i - 1) * (filters.limit || 20))}
                               >
