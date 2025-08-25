@@ -97,4 +97,5 @@ export interface SyncHistory {
 export interface SyncHistoryResponse {
   success: boolean
   data: SyncHistory[]
+  total: number
 } 
