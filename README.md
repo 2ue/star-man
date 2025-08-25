@@ -398,13 +398,15 @@ MIT License - 详见 LICENSE 文件
 - 启动：
 
 ```bash
-pnpm dev:api   # 确保 API 启动（需设置 API_PORT）
-pnpm dev:web   # 启动 Web（默认 5173，已配置 /api 代理）
+# 确保 API 服务在 3801 端口启动
+pnpm dev:api   # 后端 API（默认端口 3801）
+pnpm dev:web   # 前端 Web（默认端口 5173，已配置 /api 代理到 3801）
 ```
 
-- 环境变量：
-  - `VITE_API_URL`：可选，设置后直连该地址（例如 `http://localhost:3000`）；不设置时走 Vite 代理。
-  - `VITE_API_PROXY_TARGET`：开发模式下代理目标（默认 `http://localhost:3000`）。
+- 环境配置：
+  - 开发环境：前端使用 Vite 代理到 `http://localhost:3801`，无需额外配置
+  - 生产环境：设置 `VITE_API_URL` 环境变量指向生产 API 地址
+  - 代理配置：`/api/*`、`/api-docs`、`/health` 自动代理到后端
 
-- 技术栈：Vite 7 + React 19 + TypeScript 5 + Tailwind CSS 3 + DaisyUI 4 + Lucide Icons + TanStack Query/Router + Axios。
+- 技术栈：Vite 5 + React 18 + TypeScript 5 + Tailwind CSS 3 + DaisyUI 4 + Lucide Icons + TanStack Query/Router + Axios。
 - 布局特性：精致紧凑、侧边导航 + 顶栏、卡片化内容、表单与排版使用 Tailwind 官方插件与 DaisyUI。
