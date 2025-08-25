@@ -8,7 +8,7 @@ html, body, #root {
 }
 
 :root {
-  --app-safe-edge: 16px;
+  --app-safe-edge: 12px;
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -20,32 +20,32 @@ html, body, #root {
 
 /* 自定义紧凑排版 */
 .container-tight {
-  @apply container max-w-7xl px-4 md:px-6;
+  @apply container max-w-7xl px-3 md:px-4;
 }
 
-/* 现代化卡片样式 */
+/* 现代化卡片样式 - 更紧凑 */
 .card-modern {
-  @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+  @apply bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
 }
 
 .card-glass {
-  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl;
+  @apply bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-xl shadow-lg;
 }
 
 /* 渐变按钮 */
 .btn-gradient-primary {
   background: var(--gradient-primary);
-  @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5;
+  @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
 }
 
 .btn-gradient-secondary {
   background: var(--gradient-secondary);
-  @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5;
+  @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
 }
 
 .btn-gradient-success {
   background: var(--gradient-success);
-  @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5;
+  @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5;
 }
 
 /* 文本截断 */
@@ -84,7 +84,7 @@ html, body, #root {
 
 @keyframes slideInUp {
   from {
-    transform: translateY(20px);
+    transform: translateY(16px);
     opacity: 0;
   }
   to {
@@ -111,11 +111,11 @@ html, body, #root {
 }
 
 .animate-slide-in-up {
-  animation: slideInUp 0.6s ease-out;
+  animation: slideInUp 0.5s ease-out;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.4s ease-out;
 }
 
 /* 滚动条美化 */
@@ -137,30 +137,30 @@ html, body, #root {
   background: rgba(156, 163, 175, 0.8);
 }
 
-/* 现代化输入框 */
+/* 现代化输入框 - 暗色模式支持 */
 .input-modern {
-  @apply bg-white/80 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200;
+  @apply bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm border border-white/40 dark:border-gray-600/40 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 dark:focus:ring-blue-400/50 dark:focus:border-blue-400 transition-all duration-200 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400;
 }
 
-/* 现代化徽章 */
+/* 现代化徽章 - 暗色模式支持 */
 .badge-modern {
-  @apply px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700;
+  @apply px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 dark:from-blue-400/20 dark:to-purple-400/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300;
 }
 
-/* 响应式网格 */
+/* 响应式网格 - 更紧凑 */
 .grid-responsive {
-  @apply grid gap-4;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  @apply grid gap-3;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-/* 玻璃态效果 */
+/* 玻璃态效果 - 暗色模式支持 */
 .glass-effect {
-  @apply bg-white/10 backdrop-blur-md border border-white/20;
+  @apply bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-700/30;
 }
 
 /* 悬停效果 */
 .hover-lift {
-  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md;
 }
 
 /* 渐变文本 */
@@ -169,4 +169,43 @@ html, body, #root {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* 紧凑间距工具类 */
+.space-y-compact {
+  @apply space-y-3;
+}
+
+.space-y-medium {
+  @apply space-y-4;
+}
+
+.space-y-large {
+  @apply space-y-6;
+}
+
+/* 紧凑卡片内边距 */
+.card-compact {
+  @apply p-4;
+}
+
+.card-medium {
+  @apply p-5;
+}
+
+.card-large {
+  @apply p-6;
+}
+
+/* 暗色模式下的特殊样式 */
+.dark .card-modern {
+  @apply bg-gray-800/90 border-gray-700/30;
+}
+
+.dark .input-modern {
+  @apply bg-gray-700/80 border-gray-600/40 text-gray-100;
+}
+
+.dark .badge-modern {
+  @apply bg-gradient-to-r from-blue-400/20 to-purple-400/20 border-blue-400/30 text-blue-300;
 }
