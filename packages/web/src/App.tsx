@@ -1,4 +1,4 @@
-import { Menu, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Menu, Settings, ChevronLeft } from 'lucide-react'
 import { Outlet, Link, useLocation } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -47,9 +47,19 @@ export default function App() {
         {/* 现代化侧边栏 - 更紧凑 */}
         <aside className="drawer-side">
           <label htmlFor="app-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-          <div className={`min-h-full bg-white/80 backdrop-blur-md border-r border-white/20 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'
+          <div className={`min-h-full bg-white/80 backdrop-blur-md border-r border-white/20 transition-all duration-300 relative ${sidebarCollapsed ? 'w-16' : 'w-64'
             }`}>
-            <div className="p-4">
+            {/* 收起/展开按钮 - 移到右上角 */}
+            <button
+              onClick={toggleSidebar}
+              className={`absolute top-4 right-3 z-10 w-8 h-8 rounded-lg bg-white/80 hover:bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center group ${sidebarCollapsed ? 'rotate-180' : ''
+                }`}
+              title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
+            >
+              <ChevronLeft size={16} className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200" />
+            </button>
+
+            <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'}`}>
               {/* 侧边栏头部 */}
               <div className={`mb-6 ${sidebarCollapsed ? 'text-center' : ''}`}>
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-2 mx-auto">
@@ -63,17 +73,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* 收起/展开按钮 */}
-              <div className="flex justify-center mb-4">
-                <button
-                  onClick={toggleSidebar}
-                  className="btn btn-ghost btn-sm bg-white/50 hover:bg-white/70 rounded-full w-8 h-8 p-0"
-                  title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
-                >
-                  {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-                </button>
-              </div>
-
               <nav className="space-y-1">
                 {!sidebarCollapsed && (
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
@@ -84,8 +83,8 @@ export default function App() {
                 <Link
                   to="/"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/')
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
-                      : 'text-gray-700 hover:bg-white/50'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                    : 'text-gray-700 hover:bg-white/50'
                     } ${sidebarCollapsed ? 'justify-center' : ''}`}
                   title={sidebarCollapsed ? '总览' : ''}
                 >
@@ -97,8 +96,8 @@ export default function App() {
                 <Link
                   to="/repos"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/repos')
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
-                      : 'text-gray-700 hover:bg-white/50'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                    : 'text-gray-700 hover:bg-white/50'
                     } ${sidebarCollapsed ? 'justify-center' : ''}`}
                   title={sidebarCollapsed ? '仓库' : ''}
                 >
@@ -110,8 +109,8 @@ export default function App() {
                 <Link
                   to="/sync"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/sync')
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
-                      : 'text-gray-700 hover:bg-white/50'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                    : 'text-gray-700 hover:bg-white/50'
                     } ${sidebarCollapsed ? 'justify-center' : ''}`}
                   title={sidebarCollapsed ? '同步' : ''}
                 >
