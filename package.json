@@ -11,6 +11,8 @@
     "api": "node packages/api/dist/server.js",
     "dev:cli": "pnpm --filter @star-man/cli dev",
     "dev:api": "pnpm --filter @star-man/api dev",
+    "dev:web": "pnpm --filter @star-man/web dev",
+    "dev": "pnpm -r --parallel dev",
     "setup": "chmod +x scripts/setup.sh && ./scripts/setup.sh"
   },
   "keywords": [

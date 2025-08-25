@@ -391,3 +391,20 @@ MIT License - 详见 LICENSE 文件
 - ✅ 智能仓库分析和标签管理
 - ✅ 统一配置管理系统
 - ✅ 支持简洁路径配置
+
+## Web 前端（Vite + React + Tailwind v3）
+
+- 位置：`packages/web`
+- 启动：
+
+```bash
+pnpm dev:api   # 确保 API 启动（需设置 API_PORT）
+pnpm dev:web   # 启动 Web（默认 5173，已配置 /api 代理）
+```
+
+- 环境变量：
+  - `VITE_API_URL`：可选，设置后直连该地址（例如 `http://localhost:3000`）；不设置时走 Vite 代理。
+  - `VITE_API_PROXY_TARGET`：开发模式下代理目标（默认 `http://localhost:3000`）。
+
+- 技术栈：Vite 7 + React 19 + TypeScript 5 + Tailwind CSS 3 + DaisyUI 4 + Lucide Icons + TanStack Query/Router + Axios。
+- 布局特性：精致紧凑、侧边导航 + 顶栏、卡片化内容、表单与排版使用 Tailwind 官方插件与 DaisyUI。
