@@ -11,6 +11,9 @@ export interface Stats {
   totalRepos: number
   totalStars: number
   totalForks: number
+  currentlyStarred: number
+  unstarred: number
+  lastSyncAt: string
   categories: CategoryStat[]
   languages: LanguageStat[]
   topTags: TagStat[]
