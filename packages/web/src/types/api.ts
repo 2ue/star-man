@@ -85,14 +85,13 @@ export interface SyncResponse {
 
 export interface SyncHistory {
   id: number
-  type: 'incremental' | 'full'
+  syncAt: string
   added: number
+  updated: number
   unstarred: number
   total: number
-  startedAt: string
-  completedAt: string
-  status: 'success' | 'failed'
-  error?: string
+  errorMessage: string | null
+  success: boolean
 }
 
 export interface SyncHistoryResponse {
