@@ -211,3 +211,62 @@ html, body, #root {
 .dark .border-gray-300 {
   @apply border-gray-600;
 }
+
+/* 暗色模式下的文字颜色优化 */
+.dark .text-gray-600 {
+  color: rgb(209 213 219); /* text-gray-300 */
+}
+
+.dark .text-gray-500 {
+  color: rgb(156 163 175); /* text-gray-400 */
+}
+
+.dark .text-gray-400 {
+  color: rgb(156 163 175); /* text-gray-400 */
+}
+
+.dark .text-gray-700 {
+  color: rgb(229 231 235); /* text-gray-200 */
+}
+
+.dark .text-gray-800 {
+  color: rgb(243 244 246); /* text-gray-100 */
+}
+
+.dark .text-gray-900 {
+  color: rgb(255 255 255); /* text-white */
+}
+
+/* 暗色模式下的标题文字 */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: rgb(255 255 255); /* text-white */
+}
+
+/* 暗色模式下的段落文字 */
+.dark p {
+  color: rgb(229 231 235); /* text-gray-200 */
+}
+
+/* 暗色模式下的标签文字 */
+.dark label {
+  color: rgb(229 231 235); /* text-gray-200 */
+}
+
+/* 暗色模式下的链接文字 */
+.dark a:not(.text-gradient) {
+  color: rgb(229 231 235); /* text-gray-200 */
+}
+
+.dark a:not(.text-gradient):hover {
+  color: rgb(255 255 255); /* text-white */
+}
+
+/* 暗色模式下的按钮文字 */
+.dark .btn:not(.btn-gradient-primary):not(.btn-gradient-secondary):not(.btn-gradient-success) {
+  color: rgb(229 231 235); /* text-gray-200 */
+}
+
+/* 暗色模式下的徽章文字 */
+.dark .badge:not(.badge-modern) {
+  color: rgb(229 231 235); /* text-gray-200 */
+}
