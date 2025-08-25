@@ -8,16 +8,21 @@ export default defineConfig({
         port: 5173,
         proxy: {
             '/api': {
-                target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3000',
+                target: process.env.VITE_API_PROXY_TARGET || 'http://[::1]:3801',
                 changeOrigin: true,
-            },
-            '/api-docs': {
-                target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3000',
-                changeOrigin: true,
-            },
-            '/health': {
-                target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3000',
-                changeOrigin: true,
+                secure: false,
+                configure: (proxy, options) => {
+                    proxy.on('error', (err, req, res) => {
+                        console.log('Proxy Error:', err.message);
+                        console.log('Target:', options.target);
+                    });
+                    proxy.on('proxyReq', (proxyReq, req, res) => {
+                        console.log('Proxying:', req.method, req.url, '->', options.target);
+                    });
+                    proxy.on('proxyRes', (proxyRes, req, res) => {
+                        console.log('Proxy Response:', proxyRes.statusCode, req.url);
+                    });
+                },
             },
         },
     },

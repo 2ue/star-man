@@ -1,10 +1,11 @@
-import { RefreshCw, Rocket, History, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { RefreshCw, Rocket, History, CheckCircle, XCircle, Clock, Play, Pause, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { triggerSync, fetchSyncHistory } from '../lib/api'
 
 export default function SyncPage() {
   const [isSyncing, setIsSyncing] = useState(false)
+  const [syncType, setSyncType] = useState<'incremental' | 'full'>('incremental')
   const queryClient = useQueryClient()
 
   const { data: historyData, isLoading: historyLoading } = useQuery({
@@ -26,10 +27,10 @@ export default function SyncPage() {
     },
   })
 
-  const handleSync = async (incremental: boolean) => {
+  const handleSync = async () => {
     setIsSyncing(true)
     try {
-      await syncMutation.mutateAsync(incremental)
+      await syncMutation.mutateAsync(syncType === 'incremental')
     } catch (error) {
       console.error('同步失败:', error)
     }
@@ -45,109 +46,217 @@ export default function SyncPage() {
     })
   }
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'success':
+        return 'text-green-600 bg-green-100 dark:bg-green-900/20 dark:text-green-400'
+      case 'failed':
+        return 'text-red-600 bg-red-100 dark:bg-red-900/20 dark:text-red-400'
+      default:
+        return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400'
+    }
+  }
+
+  const getTypeColor = (type: string) => {
+    return type === 'incremental'
+      ? 'text-blue-600 bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400'
+      : 'text-purple-600 bg-purple-100 dark:bg-purple-900/20 dark:text-purple-400'
+  }
+
   return (
-    <div className="space-y-3">
-      {/* 同步操作 */}
-      <div className="card card-compact bg-base-100 shadow-sm">
-        <div className="card-body">
-          <h2 className="card-title text-base">同步 GitHub Stars</h2>
-          <div className="flex items-center gap-2">
-            <button
-              className="btn btn-sm normal-case btn-primary"
-              onClick={() => handleSync(true)}
-              disabled={isSyncing}
-            >
-              {isSyncing ? (
-                <RefreshCw size={14} className="animate-spin" />
-              ) : (
-                <RefreshCw size={14} />
-              )}
-              增量同步
-            </button>
-            <button
-              className="btn btn-sm normal-case"
-              onClick={() => handleSync(false)}
-              disabled={isSyncing}
-            >
-              {isSyncing ? (
-                <Rocket size={14} className="animate-spin" />
-              ) : (
-                <Rocket size={14} />
-              )}
-              全量同步
-            </button>
+    <div className="space-y-6 animate-slide-in-up">
+      {/* 页面标题 */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+          同步管理
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          保持你的 GitHub Stars 数据最新
+        </p>
+      </div>
+
+      {/* 同步操作控制 */}
+      <div className="card-modern">
+        <div className="p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <RefreshCw size={24} className="text-white" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">GitHub Stars 同步</h2>
           </div>
-          <div className="text-xs opacity-70">
-            {isSyncing ? '正在同步中...' : '点击按钮开始同步 GitHub Stars'}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* 同步类型选择 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">选择同步类型</h3>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors">
+                  <input
+                    type="radio"
+                    name="syncType"
+                    value="incremental"
+                    checked={syncType === 'incremental'}
+                    onChange={(e) => setSyncType(e.target.value as 'incremental' | 'full')}
+                    className="radio radio-primary"
+                  />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                      <RefreshCw size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800 dark:text-white">增量同步</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">只同步新增和变更的仓库</div>
+                    </div>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:border-purple-300 dark:hover:border-purple-600 transition-colors">
+                  <input
+                    type="radio"
+                    name="syncType"
+                    value="full"
+                    checked={syncType === 'full'}
+                    onChange={(e) => setSyncType(e.target.value as 'incremental' | 'full')}
+                    className="radio radio-primary"
+                  />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center">
+                      <Rocket size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800 dark:text-white">全量同步</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">重新同步所有仓库数据</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* 同步状态和控制 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">同步控制</h3>
+
+              <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <div className="mb-4">
+                  {isSyncing ? (
+                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <RefreshCw size={24} className="text-blue-600 animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle size={24} className="text-green-600" />
+                    </div>
+                  )}
+
+                  <h4 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+                    {isSyncing ? '正在同步中...' : '准备就绪'}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {isSyncing
+                      ? `正在执行${syncType === 'incremental' ? '增量' : '全量'}同步`
+                      : '点击按钮开始同步'
+                    }
+                  </p>
+                </div>
+
+                <button
+                  className={`btn w-full ${isSyncing
+                      ? 'btn-disabled'
+                      : 'btn-gradient-primary'
+                    }`}
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                >
+                  {isSyncing ? (
+                    <>
+                      <Pause size={16} className="mr-2" />
+                      同步中...
+                    </>
+                  ) : (
+                    <>
+                      <Play size={16} className="mr-2" />
+                      开始同步
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 同步历史 */}
-      <div className="card card-compact bg-base-100 shadow-sm">
-        <div className="card-body">
-          <div className="flex items-center gap-2">
-            <History size={16} />
-            <h2 className="card-title text-base">同步历史</h2>
+      {/* 同步历史记录 */}
+      <div className="card-modern">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+              <History size={20} className="text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">同步历史</h2>
           </div>
 
           {historyLoading ? (
-            <div className="space-y-2">
+            <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="skeleton h-12 w-full" />
+                <div key={i} className="skeleton h-24 w-full rounded-xl" />
               ))}
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-4">
               {historyData?.data && historyData.data.length > 0 ? (
                 historyData.data.map((record) => (
-                  <div key={record.id} className="border border-base-300 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`badge badge-sm ${record.status === 'success' ? 'badge-success' : 'badge-error'
-                          }`}>
+                  <div key={record.id} className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
                           {record.status === 'success' ? (
-                            <CheckCircle size={12} />
+                            <CheckCircle size={12} className="inline mr-1" />
                           ) : (
-                            <XCircle size={12} />
+                            <XCircle size={12} className="inline mr-1" />
                           )}
                           {record.status === 'success' ? '成功' : '失败'}
                         </span>
-                        <span className="badge badge-outline badge-sm">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(record.type)}`}>
                           {record.type === 'incremental' ? '增量' : '全量'}
                         </span>
                       </div>
-                      <div className="text-xs text-base-content/60">
-                        <Clock size={12} className="inline mr-1" />
+                      <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <Clock size={14} />
                         {formatDate(record.completedAt)}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <div className="text-center">
-                        <div className="font-semibold text-success">{record.added}</div>
-                        <div className="text-xs text-base-content/60">新增</div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <div className="text-lg font-bold text-green-600 dark:text-green-400">{record.added}</div>
+                        <div className="text-xs text-green-600 dark:text-green-400">新增</div>
                       </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-warning">{record.unstarred}</div>
-                        <div className="text-xs text-base-content/60">取消</div>
+                      <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                        <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{record.unstarred}</div>
+                        <div className="text-xs text-yellow-600 dark:text-yellow-400">取消</div>
                       </div>
-                      <div className="text-center">
-                        <div className="font-semibold">{record.total}</div>
-                        <div className="text-xs text-base-content/60">总计</div>
+                      <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{record.total}</div>
+                        <div className="text-xs text-blue-600 dark:text-blue-400">总计</div>
                       </div>
                     </div>
 
                     {record.error && (
-                      <div className="mt-2 p-2 bg-error/10 text-error text-xs rounded">
-                        错误: {record.error}
+                      <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
+                        <AlertCircle size={16} />
+                        <span className="text-sm">错误: {record.error}</span>
                       </div>
                     )}
                   </div>
                 ))
               ) : (
-                <div className="text-center py-4 text-base-content/60">
-                  暂无同步记录
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <History size={24} className="text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">暂无同步记录</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-500">开始第一次同步后，这里会显示历史记录</p>
                 </div>
               )}
             </div>
