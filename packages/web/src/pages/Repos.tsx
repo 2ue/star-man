@@ -76,42 +76,52 @@ export default function Repos() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <SlidersHorizontal size={16} className="text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white">筛选条件</h2>
+            <h2 className="text-lg font-semibold text-gray-800">筛选条件</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">搜索关键词</label>
-              <input
-                className="input-modern w-full"
-                placeholder="仓库名称、描述..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            {/* 搜索关键词 - 特殊样式 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">搜索关键词</label>
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  placeholder="仓库名称、描述..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                />
+              </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">编程语言</label>
+
+            {/* 编程语言 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">编程语言</label>
               <input
-                className="input-modern w-full"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                 placeholder="JavaScript, Python..."
                 value={filters.language || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, language: e.target.value || undefined }))}
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">分类</label>
+
+            {/* 分类 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">分类</label>
               <input
-                className="input-modern w-full"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                 placeholder="Backend, Frontend..."
                 value={filters.category || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value || undefined }))}
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">标签</label>
+
+            {/* 标签 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">标签</label>
               <input
-                className="input-modern w-full"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                 placeholder="react, vue, node..."
                 value={filters.tags || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, tags: e.target.value || undefined }))}
@@ -120,31 +130,31 @@ export default function Repos() {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
-                className="btn-gradient-primary px-4 py-2"
+                className="btn-gradient-primary px-6 py-2.5 text-sm font-medium"
                 onClick={handleSearch}
               >
-                <Search size={14} className="mr-1" />
+                <Search size={16} className="mr-2" />
                 查询
               </button>
               <button
-                className="btn btn-outline px-4 py-2"
+                className="px-6 py-2.5 text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 rounded-lg transition-all duration-200 flex items-center gap-2"
                 onClick={handleReset}
               >
-                <Filter size={14} className="mr-1" />
+                <SlidersHorizontal size={16} />
                 重置
               </button>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600 dark:text-gray-400">视图:</span>
-              <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <span className="text-xs text-gray-600">视图:</span>
+              <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid'
-                      ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                     }`}
                 >
                   <Grid size={14} />
@@ -152,8 +162,8 @@ export default function Repos() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-1.5 rounded-md transition-colors ${viewMode === 'list'
-                      ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
                     }`}
                 >
                   <List size={14} />
