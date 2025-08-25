@@ -113,6 +113,7 @@ importers:
       class-variance-authority: ^0.7.0
       clsx: ^2.0.0
       daisyui: ^4.4.20
+      dayjs: ^1.11.13
       eslint: ^8.56.0
       eslint-plugin-react-hooks: ^4.6.0
       eslint-plugin-react-refresh: ^0.4.5
@@ -131,6 +132,7 @@ importers:
       axios: 1.11.0
       class-variance-authority: 0.7.1
       clsx: 2.1.1
+      dayjs: 1.11.13
       lucide-react: 0.294.0_react@18.3.1
       react: 18.3.1
       react-dom: 18.3.1_react@18.3.1
@@ -2534,6 +2536,10 @@ packages:
     transitivePeerDependencies:
       - postcss
     dev: true
+
+  /dayjs/1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
