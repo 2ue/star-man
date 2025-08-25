@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+:root {
+  --app-safe-edge: 12px;
+}
+
+/* 自定义紧凑排版 */
+.container-tight {
+  @apply container max-w-7xl px-3 md:px-4;
+}
