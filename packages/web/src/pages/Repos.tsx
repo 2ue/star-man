@@ -139,7 +139,7 @@ export default function Repos() {
                 查询
               </button>
               <button
-                className="px-6 py-2.5 text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 rounded-lg transition-all duration-200 flex items-center gap-2"
+                className="px-6 py-2.5 text-sm font-medium bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"
                 onClick={handleReset}
               >
                 <SlidersHorizontal size={16} />
@@ -198,10 +198,10 @@ export default function Repos() {
           <>
             {/* 统计信息 */}
             <div className="flex items-center justify-between">
-              <div className="text-base font-medium text-gray-800 dark:text-white">
-                共找到 <span className="text-blue-600 dark:text-blue-400 font-bold">{reposData?.total || 0}</span> 个仓库
+              <div className="text-base font-medium text-gray-800">
+                共找到 <span className="text-blue-600 font-bold">{reposData?.total || 0}</span> 个仓库
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-600">
                 第 {Math.floor((filters.offset || 0) / (filters.limit || 20)) + 1} 页
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function Repos() {
                     }`}>
                     <div className={`${viewMode === 'list' ? 'flex-1' : ''}`}>
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className={`font-semibold text-gray-800 dark:text-white line-clamp-2 ${viewMode === 'list' ? 'text-base' : 'text-sm'
+                        <h3 className={`font-semibold text-gray-800 line-clamp-2 ${viewMode === 'list' ? 'text-base' : 'text-sm'
                           }`}>
                           {repo.name}
                         </h3>
@@ -223,13 +223,13 @@ export default function Repos() {
                           href={repo.htmlUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn btn-ghost btn-xs glass-effect flex-shrink-0"
+                          className="btn btn-ghost btn-xs bg-white/50 hover:bg-white/70 border border-gray-200 flex-shrink-0"
                         >
                           <ExternalLink size={12} />
                         </a>
                       </div>
 
-                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                      <p className="text-xs text-gray-600 line-clamp-2 mb-3">
                         {repo.description || '暂无描述'}
                       </p>
 
@@ -240,14 +240,14 @@ export default function Repos() {
                           </span>
                         )}
                         {repo.category && (
-                          <span className="badge badge-primary badge-xs flex items-center gap-1">
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 flex items-center gap-1">
                             <FolderOpen size={8} />
                             {repo.category}
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
                         <span className="flex items-center gap-1">
                           <Star size={12} className="text-yellow-500" />
                           {repo.stargazersCount?.toLocaleString() || 0}
@@ -261,13 +261,13 @@ export default function Repos() {
                       {repo.tags && repo.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {repo.tags.slice(0, 3).map((tag) => (
-                            <span key={tag} className="badge badge-secondary badge-xs flex items-center gap-1">
+                            <span key={tag} className="px-2 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200 flex items-center gap-1">
                               <Tag size={8} />
                               {tag}
                             </span>
                           ))}
                           {repo.tags.length > 3 && (
-                            <span className="badge badge-ghost badge-xs">+{repo.tags.length - 3}</span>
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">+{repo.tags.length - 3}</span>
                           )}
                         </div>
                       )}
