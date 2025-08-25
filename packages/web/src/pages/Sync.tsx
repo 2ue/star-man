@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { triggerSync, fetchSyncHistory } from '../lib/api'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import Pagination from '../components/Pagination'
 
 // 设置dayjs中文语言包
 dayjs.locale('zh-cn')
@@ -352,164 +353,14 @@ export default function SyncPage() {
               {/* 分页控件 */}
               {historyData?.data && historyData.data.length > 0 && (
                 <div className="mt-6 pt-4 border-t border-gray-100">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    {/* 分页信息 */}
-                    <div className="text-sm text-gray-600">
-                      <span>
-                        第 <span className="font-medium text-gray-800">{historyPage + 1}</span> 页，
-                        显示 <span className="font-medium text-gray-800">
-                          {historyPage * historyLimit + 1}
-                        </span> - <span className="font-medium text-gray-800">
-                          {Math.min((historyPage + 1) * historyLimit, historyData.total || 0)}
-                        </span> / <span className="font-medium text-gray-800">{historyData.total || 0}</span>
-                      </span>
-                    </div>
-
-                    {/* 分页控制 */}
-                    <div className="flex items-center gap-2">
-                      {/* 跳转到第一页 */}
-                      <button
-                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={historyPage === 0}
-                        onClick={() => handleHistoryPageChange(0)}
-                        title="第一页"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                        </svg>
-                      </button>
-
-                      {/* 上一页 */}
-                      <button
-                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={historyPage === 0}
-                        onClick={() => handleHistoryPageChange(historyPage - 1)}
-                        title="上一页"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7" />
-                        </svg>
-                      </button>
-
-                      {/* 页码显示 */}
-                      <div className="flex items-center gap-1">
-                        {(() => {
-                          const totalPages = Math.ceil((historyData.total || 0) / historyLimit)
-                          const maxVisiblePages = 5
-                          const currentPage = historyPage + 1
-
-                          let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
-                          let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
-
-                          if (endPage - startPage + 1 < maxVisiblePages) {
-                            startPage = Math.max(1, endPage - maxVisiblePages + 1)
-                          }
-
-                          const pages = []
-
-                          // 第一页
-                          if (startPage > 1) {
-                            pages.push(
-                              <button
-                                key={1}
-                                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                                onClick={() => handleHistoryPageChange(0)}
-                              >
-                                1
-                              </button>
-                            )
-                            if (startPage > 2) {
-                              pages.push(
-                                <span key="ellipsis1" className="px-2 py-2 text-gray-400">...</span>
-                              )
-                            }
-                          }
-
-                          // 中间页码
-                          for (let i = startPage; i <= endPage; i++) {
-                            pages.push(
-                              <button
-                                key={i}
-                                className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 ${i === currentPage
-                                    ? 'bg-blue-500 text-white shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                                  }`}
-                                onClick={() => handleHistoryPageChange(i - 1)}
-                              >
-                                {i}
-                              </button>
-                            )
-                          }
-
-                          // 最后一页
-                          if (endPage < totalPages) {
-                            if (endPage < totalPages - 1) {
-                              pages.push(
-                                <span key="ellipsis2" className="px-2 py-2 text-gray-400">...</span>
-                              )
-                            }
-                            pages.push(
-                              <button
-                                key={totalPages}
-                                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                                onClick={() => handleHistoryPageChange(totalPages - 1)}
-                              >
-                                {totalPages}
-                              </button>
-                            )
-                          }
-
-                          return pages
-                        })()}
-                      </div>
-
-                      {/* 下一页 */}
-                      <button
-                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={historyPage >= Math.ceil((historyData.total || 0) / historyLimit) - 1}
-                        onClick={() => handleHistoryPageChange(historyPage + 1)}
-                        title="下一页"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-
-                      {/* 跳转到最后一页 */}
-                      <button
-                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={historyPage >= Math.ceil((historyData.total || 0) / historyLimit) - 1}
-                        onClick={() => handleHistoryPageChange(Math.ceil((historyData.total || 0) / historyLimit) - 1)}
-                        title="最后一页"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M6 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* 快速跳转 */}
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span>跳转</span>
-                      <input
-                        type="number"
-                        min={1}
-                        max={Math.ceil((historyData.total || 0) / historyLimit)}
-                        className="w-20 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-center"
-                        placeholder="页码"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            const page = parseInt(e.currentTarget.value)
-                            if (page >= 1 && page <= Math.ceil((historyData.total || 0) / historyLimit)) {
-                              handleHistoryPageChange(page - 1)
-                              e.currentTarget.value = ''
-                            }
-                          }
-                        }}
-                      />
-                      <span>页</span>
-                    </div>
-                  </div>
+                  <Pagination
+                    total={historyData.total || 0}
+                    limit={historyLimit}
+                    offset={historyPage * historyLimit}
+                    onPageChange={(newOffset) => handleHistoryPageChange(Math.floor(newOffset / historyLimit))}
+                    onLimitChange={handleHistoryLimitChange}
+                    limitOptions={[5, 10, 20, 50]}
+                  />
                 </div>
               )}
             </>
