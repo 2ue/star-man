@@ -63,10 +63,10 @@ export default function Dashboard() {
     <div className="space-y-4 animate-slide-in-up">
       {/* 页面标题 */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
           GitHub Stars 总览
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-600">
           管理你的 GitHub 收藏，发现更多优秀项目
         </p>
       </div>
@@ -97,11 +97,11 @@ export default function Dashboard() {
               </div>
               <TrendingUp size={16} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">总 Star 数</h3>
-            <div className="text-xl font-bold text-gray-800 dark:text-white">
-              {stats?.totalStars?.toLocaleString() || 0}
+            <h3 className="text-sm font-medium text-gray-600 mb-1">总 Star 数</h3>
+            <div className="text-xl font-bold text-gray-800">
+              {stats?.currentlyStarred?.toLocaleString() || 0}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">来自所有仓库</div>
+            <div className="text-xs text-gray-500 mt-1">来自所有仓库</div>
           </div>
         </div>
 
@@ -113,11 +113,11 @@ export default function Dashboard() {
               </div>
               <TrendingUp size={16} className="text-gray-400 group-hover:text-green-500 transition-colors" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">总 Fork 数</h3>
-            <div className="text-xl font-bold text-gray-800 dark:text-white">
+            <h3 className="text-sm font-medium text-gray-600 mb-1">总 Fork 数</h3>
+            <div className="text-xl font-bold text-gray-800">
               {stats?.totalForks?.toLocaleString() || 0}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">社区活跃度</div>
+            <div className="text-xs text-gray-500 mt-1">社区活跃度</div>
           </div>
         </div>
 
@@ -129,11 +129,11 @@ export default function Dashboard() {
               </div>
               <Calendar size={16} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">最后同步</h3>
-            <div className="text-lg font-bold text-gray-800 dark:text-white">
+            <h3 className="text-sm font-medium text-gray-600 mb-1">最后同步</h3>
+            <div className="text-lg font-bold text-gray-800">
               {stats?.lastSyncAt ? new Date(stats.lastSyncAt).toLocaleDateString('zh-CN') : '未知'}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">保持最新</div>
+            <div className="text-xs text-gray-500 mt-1">保持最新</div>
           </div>
         </div>
       </div>
@@ -153,10 +153,10 @@ export default function Dashboard() {
                 <div key={cat.category} className="flex items-center justify-between group">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-yellow-500' :
-                        index === 1 ? 'bg-blue-500' :
-                          index === 2 ? 'bg-green-500' :
-                            index === 3 ? 'bg-purple-500' :
-                              index === 4 ? 'bg-pink-500' : 'bg-gray-400'
+                      index === 1 ? 'bg-blue-500' :
+                        index === 2 ? 'bg-green-500' :
+                          index === 3 ? 'bg-purple-500' :
+                            index === 4 ? 'bg-pink-500' : 'bg-gray-400'
                       }`} />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {cat.category || '未分类'}
@@ -184,10 +184,10 @@ export default function Dashboard() {
                 <div key={lang.language} className="flex items-center justify-between group">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-red-500' :
-                        index === 1 ? 'bg-blue-500' :
-                          index === 2 ? 'bg-yellow-500' :
-                            index === 3 ? 'bg-green-500' :
-                              index === 4 ? 'bg-purple-500' : 'bg-gray-400'
+                      index === 1 ? 'bg-blue-500' :
+                        index === 2 ? 'bg-yellow-500' :
+                          index === 3 ? 'bg-green-500' :
+                            index === 4 ? 'bg-purple-500' : 'bg-gray-400'
                       }`} />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {lang.language || '未知'}
