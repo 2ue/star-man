@@ -102,43 +102,77 @@ export default function SyncPage() {
             <div className="space-y-3">
               <h3 className="text-base font-medium text-gray-700 mb-3">选择同步类型</h3>
 
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors">
-                  <input
-                    type="radio"
-                    name="syncType"
-                    value="incremental"
-                    checked={syncType === 'incremental'}
-                    onChange={(e) => setSyncType(e.target.value as 'incremental' | 'full')}
-                    className="radio radio-primary radio-sm"
-                  />
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-                      <RefreshCw size={16} className="text-white" />
+              <div className="space-y-3">
+                <label
+                  className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${syncType === 'incremental'
+                      ? 'border-2 border-blue-500 bg-blue-50 shadow-lg shadow-blue-500/20'
+                      : 'border-2 border-gray-200 bg-white hover:border-blue-300 hover:bg-purple-50/30'
+                    }`}
+                  onClick={() => setSyncType('incremental')}
+                >
+                  <div className="flex items-center justify-center">
+                    <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${syncType === 'incremental'
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300'
+                      }`}>
+                      {syncType === 'incremental' && (
+                        <div className="w-full h-full rounded-full bg-white scale-75"></div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${syncType === 'incremental'
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg'
+                        : 'bg-gradient-to-br from-blue-400 to-blue-600'
+                      }`}>
+                      <RefreshCw size={20} className="text-white" />
                     </div>
                     <div>
-                      <div className="font-medium text-sm text-gray-800">增量同步</div>
-                      <div className="text-xs text-gray-600">只同步新增和变更的仓库</div>
+                      <div className={`font-semibold text-base transition-colors duration-300 ${syncType === 'incremental' ? 'text-blue-800' : 'text-gray-800'
+                        }`}>
+                        增量同步
+                      </div>
+                      <div className={`text-sm transition-colors duration-300 ${syncType === 'incremental' ? 'text-blue-600' : 'text-gray-600'
+                        }`}>
+                        只同步新增和变更的仓库
+                      </div>
                     </div>
                   </div>
                 </label>
 
-                <label className="flex items-center gap-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-300 transition-colors">
-                  <input
-                    type="radio"
-                    name="syncType"
-                    value="full"
-                    checked={syncType === 'full'}
-                    onChange={(e) => setSyncType(e.target.value as 'incremental' | 'full')}
-                    className="radio radio-primary radio-sm"
-                  />
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center">
-                      <Rocket size={16} className="text-white" />
+                <label
+                  className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${syncType === 'full'
+                      ? 'border-2 border-purple-500 bg-purple-50 shadow-lg shadow-purple-500/20'
+                      : 'border-2 border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/30'
+                    }`}
+                  onClick={() => setSyncType('full')}
+                >
+                  <div className="flex items-center justify-center">
+                    <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${syncType === 'full'
+                        ? 'border-purple-500 bg-purple-500'
+                        : 'border-gray-300'
+                      }`}>
+                      {syncType === 'full' && (
+                        <div className="w-full h-full rounded-full bg-white scale-75"></div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${syncType === 'full'
+                        ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg'
+                        : 'bg-gradient-to-br from-purple-400 to-purple-600'
+                      }`}>
+                      <Rocket size={20} className="text-white" />
                     </div>
                     <div>
-                      <div className="font-medium text-sm text-gray-800">全量同步</div>
-                      <div className="text-xs text-gray-600">重新同步所有仓库数据</div>
+                      <div className={`font-semibold text-base transition-colors duration-300 ${syncType === 'full' ? 'text-purple-800' : 'text-gray-800'
+                        }`}>
+                        全量同步
+                      </div>
+                      <div className={`text-sm transition-colors duration-300 ${syncType === 'full' ? 'text-purple-600' : 'text-gray-600'
+                        }`}>
+                        重新同步所有仓库数据
+                      </div>
                     </div>
                   </div>
                 </label>
