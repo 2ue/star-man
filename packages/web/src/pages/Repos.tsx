@@ -285,19 +285,23 @@ export default function Repos() {
                     {/* 分页信息 */}
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <span>
-                        显示第 <span className="font-medium text-gray-800">
+                        <span className="font-medium text-gray-800">
                           {(filters.offset || 0) + 1}
                         </span> - <span className="font-medium text-gray-800">
                           {Math.min((filters.offset || 0) + (filters.limit || 20), reposData.total || 0)}
-                        </span> 条，
-                        共 <span className="font-medium text-gray-800">{reposData.total || 0}</span> 条记录
+                        </span> / <span className="font-medium text-gray-800">{reposData.total || 0}</span>
                       </span>
 
                       {/* 每页数量选择 */}
                       <div className="flex items-center gap-2">
                         <span>每页</span>
                         <select
-                          className="px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+                          className="w-20 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 appearance-none bg-no-repeat bg-right pr-8"
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: 'right 0.5rem center',
+                            backgroundSize: '1.5em 1.5em'
+                          }}
                           value={filters.limit || 20}
                           onChange={(e) => {
                             const newLimit = parseInt(e.target.value)
@@ -324,7 +328,7 @@ export default function Repos() {
                         className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={filters.offset === 0}
                         onClick={() => handlePageChange(0)}
-                        title="跳转到第一页"
+                        title="第一页"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -339,7 +343,7 @@ export default function Repos() {
                         title="上一页"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7" />
                         </svg>
                       </button>
 
@@ -435,7 +439,7 @@ export default function Repos() {
                           const totalPages = Math.ceil((reposData.total || 0) / (filters.limit || 20))
                           handlePageChange((totalPages - 1) * (filters.limit || 20))
                         }}
-                        title="跳转到最后一页"
+                        title="最后一页"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M6 5l7 7-7 7" />
@@ -445,12 +449,12 @@ export default function Repos() {
 
                     {/* 快速跳转 */}
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span>跳转到</span>
+                      <span>跳转</span>
                       <input
                         type="number"
                         min={1}
                         max={Math.ceil((reposData.total || 0) / (filters.limit || 20))}
-                        className="w-16 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
+                        className="w-20 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-center"
                         placeholder="页码"
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
