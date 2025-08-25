@@ -1,35 +1,20 @@
-import { Menu, Sun, Moon, Settings } from 'lucide-react'
+import { Menu, Settings } from 'lucide-react'
 import { Outlet, Link, useLocation } from '@tanstack/react-router'
-import { useState } from 'react'
 
 export default function App() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const location = useLocation()
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
-  }
 
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${theme === 'light'
-        ? 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-        : 'bg-gray-900'
-      }`}>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="drawer lg:drawer-open">
         <input id="app-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
           {/* 现代化顶部导航栏 - 更紧凑 */}
-          <div className={`navbar border-b transition-colors duration-300 ${theme === 'light'
-              ? 'bg-white/80 backdrop-blur-md border-white/20'
-              : 'bg-gray-800 border-gray-700'
-            } h-14 min-h-14 px-4 backdrop-blur-md`}>
+          <div className="navbar bg-white/80 backdrop-blur-md border-b border-white/20 h-14 min-h-14 px-4">
             <div className="flex items-center gap-3">
-              <label htmlFor="app-drawer" className={`btn btn-ghost btn-sm lg:hidden ${theme === 'light'
-                  ? 'bg-white/50 hover:bg-white/70'
-                  : 'bg-gray-700 hover:bg-gray-600'
-                }`}>
+              <label htmlFor="app-drawer" className="btn btn-ghost btn-sm lg:hidden bg-white/50 hover:bg-white/70">
                 <Menu size={16} />
               </label>
               <div className="flex items-center gap-2">
@@ -41,19 +26,7 @@ export default function App() {
             </div>
             <div className="flex-1" />
             <div className="flex items-center gap-2">
-              <button
-                className={`btn btn-ghost btn-sm ${theme === 'light'
-                    ? 'bg-white/50 hover:bg-white/70'
-                    : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
-                onClick={toggleTheme}
-              >
-                {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
-              </button>
-              <button className={`btn btn-ghost btn-sm ${theme === 'light'
-                  ? 'bg-white/50 hover:bg-white/70'
-                  : 'bg-gray-700 hover:bg-gray-600'
-                }`}>
+              <button className="btn btn-ghost btn-sm bg-white/50 hover:bg-white/70">
                 <Settings size={14} />
               </button>
             </div>
@@ -68,29 +41,26 @@ export default function App() {
         {/* 现代化侧边栏 - 更紧凑 */}
         <aside className="drawer-side">
           <label htmlFor="app-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-          <div className={`w-64 min-h-full border-r transition-colors duration-300 ${theme === 'light'
-              ? 'bg-white/80 backdrop-blur-md border-white/20'
-              : 'bg-gray-800 border-gray-700'
-            } backdrop-blur-md`}>
+          <div className="w-64 min-h-full bg-white/80 backdrop-blur-md border-r border-white/20">
             <div className="p-4">
               <div className="mb-6">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-2">
                   <span className="text-white font-bold text-base">S</span>
                 </div>
-                <h2 className="text-base font-semibold text-gray-800 dark:text-white">Star‑Man</h2>
-                <p className="text-xs text-gray-600 dark:text-gray-400">GitHub Star 管理工具</p>
+                <h2 className="text-base font-semibold text-gray-800">Star‑Man</h2>
+                <p className="text-xs text-gray-600">GitHub Star 管理工具</p>
               </div>
 
               <nav className="space-y-1">
-                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                   导航
                 </div>
 
                 <Link
                   to="/"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/')
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                    : 'text-gray-700 hover:bg-white/50'
                     }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isActive('/') ? 'bg-blue-500' : 'bg-gray-400'
@@ -101,8 +71,8 @@ export default function App() {
                 <Link
                   to="/repos"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/repos')
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                    : 'text-gray-700 hover:bg-white/50'
                     }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isActive('/repos') ? 'bg-blue-500' : 'bg-gray-400'
@@ -113,8 +83,8 @@ export default function App() {
                 <Link
                   to="/sync"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/sync')
-                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 dark:border-blue-400/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                    : 'text-gray-700 hover:bg-white/50'
                     }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full ${isActive('/sync') ? 'bg-blue-500' : 'bg-gray-400'
