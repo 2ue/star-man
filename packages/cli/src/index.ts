@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { createInitCommand } from './commands/init.js';
 import { createSyncCommand } from './commands/sync.js';
 import { createListCommand } from './commands/list.js';
 import { createStatsCommand } from './commands/stats.js';
@@ -14,6 +15,7 @@ export function createCLI(): Command {
     .version('1.0.0');
   
   // 添加子命令
+  program.addCommand(createInitCommand());
   program.addCommand(createSyncCommand());
   program.addCommand(createListCommand());
   program.addCommand(createStatsCommand());
@@ -23,6 +25,7 @@ export function createCLI(): Command {
   return program;
 }
 
+export * from './commands/init.js';
 export * from './commands/sync.js';
 export * from './commands/list.js';
 export * from './commands/stats.js';

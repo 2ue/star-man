@@ -59,7 +59,7 @@ export default function Pagination({
               <div className="flex items-center gap-2">
                 <span>每页</span>
                 <select
-                  className="w-20 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 appearance-none bg-no-repeat bg-right pr-8"
+                  className="w-24 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 appearance-none bg-no-repeat bg-right pr-8"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
                     backgroundPosition: 'right 0.5rem center',
@@ -99,7 +99,7 @@ export default function Pagination({
               title="上一页"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7-7 7" />
               </svg>
             </button>
 
@@ -206,7 +206,7 @@ export default function Pagination({
                 type="number"
                 min={1}
                 max={totalPages}
-                className="w-20 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-center"
+                className="w-24 px-2 py-1 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-center"
                 placeholder="页码"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {

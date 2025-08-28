@@ -13,6 +13,15 @@ export function createReposRouter(starManager: StarManager): Router {
     query('search').optional().isString(),
     query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
     query('offset').optional().isInt({ min: 0 }).toInt(),
+    // 新增参数验证
+    query('minStars').optional().isInt({ min: 0 }).toInt(),
+    query('maxStars').optional().isInt({ min: 0 }).toInt(),
+    query('pushedAfter').optional().isISO8601(),
+    query('pushedBefore').optional().isISO8601(),
+    query('updatedAfter').optional().isISO8601(),
+    query('updatedBefore').optional().isISO8601(),
+    query('sort').optional().isIn(['relevance', 'stars', 'forks', 'pushed', 'updated', 'created']),
+    query('order').optional().isIn(['asc', 'desc']),
   ], async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
@@ -27,6 +36,15 @@ export function createReposRouter(starManager: StarManager): Router {
         search: req.query.search as string,
         limit: parseInt(req.query.limit as string) || 20,
         offset: parseInt(req.query.offset as string) || 0,
+        // 新增参数
+        minStars: req.query.minStars ? parseInt(req.query.minStars as string) : undefined,
+        maxStars: req.query.maxStars ? parseInt(req.query.maxStars as string) : undefined,
+        pushedAfter: req.query.pushedAfter as string,
+        pushedBefore: req.query.pushedBefore as string,
+        updatedAfter: req.query.updatedAfter as string,
+        updatedBefore: req.query.updatedBefore as string,
+        sort: (req.query.sort as any) || 'relevance',
+        order: (req.query.order as any) || 'desc',
       };
 
       const result = await starManager.getStarredRepos(options);

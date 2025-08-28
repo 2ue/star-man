@@ -49,14 +49,17 @@ export default function App() {
           <label htmlFor="app-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
           <div className={`min-h-full bg-white/80 backdrop-blur-md border-r border-white/20 transition-all duration-300 relative ${sidebarCollapsed ? 'w-16' : 'w-64'
             }`}>
-            {/* 收起/展开按钮 - 移到右上角 */}
+            {/* 收起/展开按钮 - 确保在所有状态下都可见 */}
             <button
               onClick={toggleSidebar}
-              className={`absolute top-4 right-3 z-10 w-8 h-8 rounded-lg bg-white/80 hover:bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center group ${sidebarCollapsed ? 'rotate-180' : ''
+              className={`absolute top-4 z-20 w-8 h-8 rounded-lg bg-white/90 hover:bg-white border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center group ${sidebarCollapsed ? 'right-1' : 'right-3'
                 }`}
               title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
             >
-              <ChevronLeft size={16} className="text-gray-600 group-hover:text-gray-800 transition-colors duration-200" />
+              <ChevronLeft
+                size={16}
+                className={`text-gray-600 group-hover:text-gray-800 transition-all duration-200 ${sidebarCollapsed ? 'rotate-180' : ''}`}
+              />
             </button>
 
             <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'}`}>

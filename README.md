@@ -18,6 +18,15 @@
 - **GitHub API**：@octokit/rest
 - **数据库**：Prisma ORM (SQLite/MySQL)
 - **CLI 框架**：commander.js
+
+## 📚 项目文档
+
+详细的项目分析、优化建议和扩展规划请查看：
+
+- 📊 **[项目深度分析报告](./docs/analysis/PROJECT_ANALYSIS.md)** - 架构分析、性能评估、代码质量报告
+- ⚡ **[性能优化指南](./docs/optimization/PERFORMANCE_OPTIMIZATION.md)** - 具体优化方案和实施计划  
+- 🏗️ **[架构扩展规划](./docs/planning/ARCHITECTURE_ROADMAP.md)** - 未来发展路线图和商业化规划
+- 📁 **[文档导航](./docs/README.md)** - 完整文档结构和使用建议
 - **API 框架**：Express.js
 
 ## 🚀 快速开始

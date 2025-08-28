@@ -5,6 +5,9 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r build",
+    "build:cli": "pnpm --filter @star-man/cli build:cli",
+    "build:api": "pnpm --filter @star-man/api build:api",
+    "build:web": "pnpm --filter @star-man/web build:web",
     "test": "pnpm -r test",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "cli": "node packages/cli/dist/bin.js",

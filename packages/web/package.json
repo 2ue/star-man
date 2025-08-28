@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_API_PROXY_TARGET=http://[::1]:3801 vite --port 5173 --host",
+    "dev": "VITE_API_PROXY_TARGET=http://[::1]:3801 vite --port 5143 --host",
     "dev:port": "vite --port",
     "build": "tsc -b && vite build",
+    "build:web": "./build-web.sh",
     "lint": "eslint .",
     "preview": "vite preview"
   },

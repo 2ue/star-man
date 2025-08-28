@@ -74,6 +74,21 @@ export interface GetReposOptions {
   limit?: number;
   offset?: number;
   includeUnstarred?: boolean;
+
+  // 新增字段
+  // 时间筛选
+  pushedAfter?: string;      // 最后活跃时间范围开始
+  pushedBefore?: string;     // 最后活跃时间范围结束
+  updatedAfter?: string;     // 元数据更新时间范围开始
+  updatedBefore?: string;    // 元数据更新时间范围结束
+
+  // 数量筛选
+  minStars?: number;         // 最小Star数
+  maxStars?: number;         // 最大Star数
+
+  // 排序
+  sort?: 'relevance' | 'stars' | 'forks' | 'pushed' | 'updated' | 'created';
+  order?: 'asc' | 'desc';
 }
 
 export interface GetReposResult {

@@ -222,6 +222,8 @@ export class StarManager {
   }
 
   async getStarredRepos(options: GetReposOptions = {}): Promise<GetReposResult> {
+    console.log('🔍 getStarredRepos called with options:', JSON.stringify(options, null, 2));
+
     const prisma = this.db.getPrisma();
     const {
       category,
@@ -229,8 +231,27 @@ export class StarManager {
       tags,
       search,
       limit = 20,
-      offset = 0
+      offset = 0,
+      pushedAfter,
+      pushedBefore,
+      updatedAfter,
+      updatedBefore,
+      minStars,
+      maxStars,
+      sort = 'relevance',
+      order = 'desc'
     } = options;
+
+    console.log('🔍 Parsed options:', {
+      minStars,
+      maxStars,
+      pushedAfter,
+      pushedBefore,
+      updatedAfter,
+      updatedBefore,
+      sort,
+      order
+    });
 
     const where: any = {};
 
@@ -255,10 +276,107 @@ export class StarManager {
       ];
     }
 
+    // 新增：Star数量范围筛选
+    if (minStars !== undefined || maxStars !== undefined) {
+      console.log('🔍 Adding star count filter:', { minStars, maxStars });
+      if (minStars !== undefined && maxStars !== undefined) {
+        where.stargazersCount = {
+          gte: minStars,
+          lte: maxStars
+        };
+      } else if (minStars !== undefined) {
+        where.stargazersCount = {
+          gte: minStars
+        };
+      } else if (maxStars !== undefined) {
+        where.stargazersCount = {
+          lte: maxStars
+        };
+      }
+    }
+
+    // 新增：时间范围筛选
+    if (pushedAfter || pushedBefore) {
+      console.log('🔍 Adding pushed time filter:', { pushedAfter, pushedBefore });
+      if (pushedAfter && pushedBefore) {
+        where.pushedAt = {
+          gte: new Date(pushedAfter),
+          lte: new Date(pushedBefore)
+        };
+      } else if (pushedAfter) {
+        where.pushedAt = {
+          gte: new Date(pushedAfter)
+        };
+      } else if (pushedBefore) {
+        where.pushedAt = {
+          lte: new Date(pushedBefore)
+        };
+      }
+    }
+
+    if (updatedAfter || updatedBefore) {
+      console.log('🔍 Adding updated time filter:', { updatedAfter, updatedBefore });
+      if (updatedAfter && updatedBefore) {
+        where.updatedAt = {
+          gte: new Date(updatedAfter),
+          lte: new Date(updatedBefore)
+        };
+      } else if (updatedAfter) {
+        where.updatedAt = {
+          gte: new Date(updatedAfter)
+        };
+      } else if (updatedBefore) {
+        where.updatedAt = {
+          lte: new Date(updatedBefore)
+        };
+      }
+    }
+
+    console.log('🔍 Final where clause:', JSON.stringify(where, null, 2));
+
+    // 新增：排序逻辑
+    let orderBy: any = {};
+    switch (sort) {
+      case 'stars':
+        orderBy.stargazersCount = order;
+        break;
+      case 'forks':
+        orderBy.forksCount = order;
+        break;
+      case 'pushed':
+        orderBy.pushedAt = order;
+        break;
+      case 'updated':
+        orderBy.updatedAt = order;
+        break;
+      case 'created':
+        orderBy.createdAt = order;
+        break;
+      case 'relevance':
+      default:
+        // 相关度排序：有搜索关键词时优先显示匹配的
+        if (search) {
+          orderBy = [
+            {
+              // 名称完全匹配的优先级最高
+              _relevance: {
+                fields: ['name'],
+                search: search,
+                sort: 'desc'
+              }
+            },
+            { starredAt: 'desc' } // 其次按收藏时间
+          ];
+        } else {
+          orderBy.starredAt = 'desc'; // 默认按收藏时间
+        }
+        break;
+    }
+
     const [repos, total] = await Promise.all([
       prisma.starredRepo.findMany({
         where,
-        orderBy: { starredAt: 'desc' },
+        orderBy,
         skip: offset,
         take: limit
       }),
