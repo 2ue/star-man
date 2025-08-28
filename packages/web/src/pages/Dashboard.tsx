@@ -6,7 +6,7 @@ export default function Dashboard() {
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['stats'],
     queryFn: fetchStats,
-    refetchInterval: 30000, // 30秒刷新一次
+    refetchInterval: parseInt(import.meta.env.VITE_STATS_REFRESH_INTERVAL || '30000'), // 默认 30 秒刷新
   })
 
   if (isLoading) {
