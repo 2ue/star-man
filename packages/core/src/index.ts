@@ -9,6 +9,6 @@ export * from './config/manager';
 
 // 便捷的工厂函数
 export { StarManager } from './star-manager';
-export { loadConfig, validateConfig, displayConfig } from './config';
+export { loadConfig, validateConfig, displayConfig, getProjectRoot, checkWorkingDirectory } from './config';
 export { getStarManager, closeStarManager } from './manager-factory';
 export { ConfigManager, getUnifiedConfig, initConfig } from './config/manager';

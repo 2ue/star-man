@@ -3,11 +3,16 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
-import { StarManager, loadConfig, validateConfig, displayConfig } from '@star-man/core';
+import { StarManager, loadConfig, validateConfig, displayConfig, checkWorkingDirectory } from '@star-man/core';
 import { createReposRouter } from './routes/repos';
 import { createSyncRouter } from './routes/sync';
 import { createUnstarRoutes } from './routes/unstar';
 import statsRouter from './routes/stats';
+
+// 检查工作目录（仅在非 CI 环境）
+if (!process.env.CI) {
+  checkWorkingDirectory();
+}
 
 const app = express();
 
@@ -126,7 +131,10 @@ async function startServer() {
     displayConfig(config);
 
     const PORT = config.api.port;
-    const HOST = config.api.host; // 可以为 undefined，这时 Express 会使用默认值
+    // 开发环境强制 0.0.0.0 避免 IPv4/IPv6 冲突，生产环境允许配置
+    const HOST: string = process.env.NODE_ENV === 'production'
+      ? (config.api.host || '0.0.0.0')
+      : '0.0.0.0';
 
     // 初始化 StarManager
     const starManager = new StarManager(config);
@@ -181,21 +189,16 @@ async function startServer() {
     });
 
     // 启动服务器
-    if (HOST) {
-      app.listen(PORT, HOST, () => {
-        console.log(`🚀 Star-Man API 服务器启动成功`);
-        console.log(`📍 服务地址: http://${HOST}:${PORT}`);
-        console.log(`📚 API 文档: http://${HOST}:${PORT}/api-docs`);
-        console.log(`💚 健康检查: http://${HOST}:${PORT}/health`);
-      });
-    } else {
-      app.listen(PORT, () => {
-        console.log(`🚀 Star-Man API 服务器启动成功`);
-        console.log(`📍 服务地址: http://localhost:${PORT}`);
-        console.log(`📚 API 文档: http://localhost:${PORT}/api-docs`);
-        console.log(`💚 健康检查: http://localhost:${PORT}/health`);
-      });
-    }
+    app.listen(PORT, HOST, () => {
+      const displayHost = HOST === '0.0.0.0' ? 'localhost' : HOST;
+      console.log(`🚀 Star-Man API 服务器启动成功`);
+      console.log(`📍 服务地址: http://${displayHost}:${PORT}`);
+      console.log(`📚 API 文档: http://${displayHost}:${PORT}/api-docs`);
+      console.log(`💚 健康检查: http://${displayHost}:${PORT}/health`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`🔧 开发模式: 监听所有接口 (${HOST})`);
+      }
+    });
 
     // 优雅关闭
     process.on('SIGTERM', async () => {

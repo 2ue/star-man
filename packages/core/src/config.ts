@@ -1,35 +1,64 @@
 import { config } from 'dotenv';
 import { Config } from './types';
-import { join, resolve, isAbsolute } from 'path';
-import { existsSync } from 'fs';
+import { join, isAbsolute, dirname } from 'path';
+import { existsSync, readFileSync } from 'fs';
 
-// 查找项目根目录的 .env 文件
+/**
+ * 查找项目根目录（monorepo 的根目录）
+ * 策略：从当前模块位置向上查找，直到找到包含 workspaces 字段的 package.json
+ */
+function findProjectRoot(): string {
+  // 从当前模块文件所在目录开始
+  let dir = __dirname;
+
+  while (dir !== '/' && dir !== '.') {
+    const pkgPath = join(dir, 'package.json');
+
+    if (existsSync(pkgPath)) {
+      try {
+        const pkgContent = readFileSync(pkgPath, 'utf-8');
+        const pkg = JSON.parse(pkgContent);
+
+        // 如果有 workspaces 字段或 pnpm-workspace.yaml，说明是 monorepo 根目录
+        if (pkg.workspaces || existsSync(join(dir, 'pnpm-workspace.yaml'))) {
+          return dir;
+        }
+      } catch (err) {
+        // 忽略 JSON 解析错误，继续向上查找
+      }
+    }
+
+    // 检查 .git 目录（备用策略）
+    if (existsSync(join(dir, '.git'))) {
+      return dir;
+    }
+
+    const parentDir = dirname(dir);
+    if (parentDir === dir) break; // 已到达文件系统根目录
+    dir = parentDir;
+  }
+
+  // 兜底：使用当前工作目录
+  return process.cwd();
+}
+
+// 全局项目根目录（在模块加载时确定，不会改变）
+const PROJECT_ROOT = findProjectRoot();
+
+/**
+ * 查找项目根目录的 .env 文件
+ * 简化版：直接从项目根目录查找
+ */
 function findEnvFile(): string | undefined {
-  // 策略1: 尝试当前工作目录
-  let envPath = join(process.cwd(), '.env');
+  const envPath = join(PROJECT_ROOT, '.env');
   if (existsSync(envPath)) {
     return envPath;
   }
 
-  // 策略2: 如果在 packages/* 目录，尝试根目录
-  if (process.cwd().includes('/packages/')) {
-    const rootDir = process.cwd().split('/packages/')[0];
-    envPath = join(rootDir, '.env');
-    if (existsSync(envPath)) {
-      return envPath;
-    }
-  }
-
-  // 策略3: 向上查找（最多3层）
-  let currentDir = process.cwd();
-  for (let i = 0; i < 3; i++) {
-    envPath = join(currentDir, '.env');
-    if (existsSync(envPath)) {
-      return envPath;
-    }
-    const parentDir = resolve(currentDir, '..');
-    if (parentDir === currentDir) break; // 到达文件系统根目录
-    currentDir = parentDir;
+  // 兜底：尝试当前工作目录
+  const cwdEnvPath = join(process.cwd(), '.env');
+  if (existsSync(cwdEnvPath)) {
+    return cwdEnvPath;
   }
 
   return undefined;
@@ -39,12 +68,18 @@ function findEnvFile(): string | undefined {
 const envPath = findEnvFile();
 if (envPath) {
   config({ path: envPath });
+  // 调试信息（开发环境）
+  if (process.env.DEBUG) {
+    console.log(`📁 项目根目录: ${PROJECT_ROOT}`);
+    console.log(`📄 .env 文件: ${envPath}`);
+  }
 } else {
   console.warn('⚠️  未找到 .env 文件，将使用环境变量');
 }
 
 /**
  * 将简洁的路径转换为 Prisma 需要的 file: URL 格式
+ * 重要：所有相对路径都基于项目根目录解析，而非 process.cwd()
  */
 function convertToFileUrl(path: string): string {
   // 如果已经是 file: URL，直接返回
@@ -60,9 +95,9 @@ function convertToFileUrl(path: string): string {
   // 处理本地文件路径（SQLite）
   let filePath = path;
 
-  // 如果是相对路径，从项目根目录计算
+  // ✅ 关键修复：相对路径基于项目根目录，而非 process.cwd()
   if (!isAbsolute(filePath)) {
-    filePath = resolve(process.cwd(), filePath);
+    filePath = join(PROJECT_ROOT, filePath);
   }
 
   return `file:${filePath}`;
@@ -193,4 +228,35 @@ export function displayConfig(config: Config): void {
     console.log('   API 服务: 未配置');
   }
   console.log('');
+}
+
+/**
+ * 导出项目根目录路径，供其他模块使用
+ */
+export function getProjectRoot(): string {
+  return PROJECT_ROOT;
+}
+
+/**
+ * 检查当前是否从项目根目录运行
+ * 用于运行时警告
+ */
+export function checkWorkingDirectory(): void {
+  const cwd = process.cwd();
+
+  // 如果不在项目根目录或其子目录运行，发出警告
+  if (!cwd.startsWith(PROJECT_ROOT)) {
+    console.warn('\n⚠️  警告: 当前工作目录可能不在项目内');
+    console.warn(`   当前目录: ${cwd}`);
+    console.warn(`   项目根目录: ${PROJECT_ROOT}`);
+    console.warn('   这可能导致路径解析错误\n');
+  }
+
+  // 检查是否缺少关键标记文件
+  if (!existsSync(join(PROJECT_ROOT, 'pnpm-workspace.yaml')) &&
+      !existsSync(join(PROJECT_ROOT, '.git'))) {
+    console.warn('\n⚠️  警告: 项目根目录检测可能不准确');
+    console.warn(`   检测到的根目录: ${PROJECT_ROOT}`);
+    console.warn('   未找到 pnpm-workspace.yaml 或 .git 目录\n');
+  }
 }

@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "ts-node-dev --respawn --ignore-watch node_modules --ignore-watch ../../packages/core/dist src/server.ts",
     "test": "jest",
     "lint": "eslint src --ext .ts"
   },

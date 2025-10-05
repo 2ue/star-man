@@ -74,9 +74,8 @@ print_success "依赖安装完成"
 
 # 4. 生成 Prisma Client
 print_info "生成 Prisma Client..."
-cd packages/core
-pnpm db:generate
-cd ../..
+# 从项目根目录运行，使用本地 Prisma，通过 --schema 指定位置
+pnpm exec prisma generate --schema=./packages/core/prisma/schema.prisma
 print_success "Prisma Client 生成完成"
 
 # 5. 初始化数据库
@@ -101,9 +100,8 @@ mkdir -p packages/data
 
 # 执行数据库推送
 if [ ! -f "$DB_PATH" ]; then
-    cd packages/core
-    pnpm db:push
-    cd ../..
+    # 从项目根目录运行，使用本地 Prisma
+    pnpm exec prisma db push --schema=./packages/core/prisma/schema.prisma
     print_success "数据库初始化完成"
 else
     print_info "使用现有数据库"

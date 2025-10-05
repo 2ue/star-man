@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   // 加载环境变量
   const env = loadEnv(mode, process.cwd(), '')
-  
+  console.log(`env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:3801'`, env);
+
   return {
     plugins: [react()],
     server: {
@@ -13,19 +14,19 @@ export default defineConfig(({ mode }) => {
       port: parseInt(env.VITE_DEV_PORT || '5143'),
       proxy: {
         '/api': {
-          target: env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:3801',
+          target: env.VITE_API_PROXY_TARGET || `http://localhost:${env.API_PORT || '3801'}`,
           changeOrigin: true,
           secure: false,
           configure: (proxy, options) => {
             if (env.VITE_ENABLE_PROXY_LOGGING === 'true') {
-              proxy.on('error', (err, req, res) => {
+              proxy.on('error', (err) => {
                 console.log('Proxy Error:', err.message);
                 console.log('Target:', options.target);
               });
-              proxy.on('proxyReq', (proxyReq, req, res) => {
+              proxy.on('proxyReq', (proxyReq, req) => {
                 console.log('Proxying:', req.method, req.url, '->', options.target);
               });
-              proxy.on('proxyRes', (proxyRes, req, res) => {
+              proxy.on('proxyRes', (proxyRes, req) => {
                 console.log('Proxy Response:', proxyRes.statusCode, req.url);
               });
             }

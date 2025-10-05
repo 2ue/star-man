@@ -323,8 +323,11 @@ star-man/
 
 **SQLite（推荐，默认）：**
 ```env
-# 使用 file: 协议（推荐）
-DATABASE_URL=file:./data/star-man.db
+# 使用相对路径（推荐，相对于项目根目录）
+DATABASE_URL=./packages/data/test.db
+
+# 或使用 file: 协议
+DATABASE_URL=file:./packages/data/test.db
 
 # 或使用绝对路径
 DATABASE_URL=file:/absolute/path/to/star-man.db
@@ -340,7 +343,10 @@ DATABASE_URL=mysql://user:password@localhost:3306/star_man
 DATABASE_URL=postgresql://user:password@localhost:5432/star_man
 ```
 
-> 📝 **注意**：SQLite 数据库必须使用 `file:` 协议前缀，否则 Prisma 会报错。
+> 📝 **重要说明**：
+> - **相对路径解析规则**：所有相对路径（如 `./packages/data/test.db`）都基于项目根目录解析，而非当前工作目录
+> - 这意味着无论从哪个子目录运行应用（CLI、API），路径解析都是一致的
+> - SQLite 的 `file:` 协议前缀是可选的，系统会自动添加
 
 ## 🔍 故障排除
 
@@ -352,9 +358,10 @@ DATABASE_URL=postgresql://user:password@localhost:5432/star_man
 
 **2. 数据库连接问题**
 - 检查 `DATABASE_URL` 配置是否正确
-- SQLite 必须使用 `file:` 协议前缀（例如：`file:./data/star-man.db`）
+- **相对路径规则**：相对路径（如 `./packages/data/test.db`）始终基于项目根目录解析
 - 确保数据库文件目录有写权限
 - 运行 `pnpm db:generate` 和 `pnpm db:push` 初始化数据库
+- **调试路径**：设置 `DEBUG=1` 环境变量可查看项目根目录和 .env 文件路径
 
 **3. 构建失败**
 - 确保 Node.js 版本 >= 18
@@ -368,6 +375,10 @@ DATABASE_URL=postgresql://user:password@localhost:5432/star_man
 
 启用调试日志：
 ```bash
+# 查看路径解析信息
+DEBUG=1 pnpm cli sync
+
+# 查看完整调试日志
 DEBUG=star-manager:* pnpm cli sync
 ```
 
@@ -382,18 +393,36 @@ DEBUG=star-manager:* pnpm cli sync
 
 ### 数据库操作
 
+**推荐方式（从项目根目录）：**
+```bash
+# 生成 Prisma 客户端
+pnpm --filter @star-man/core db:generate
+
+# 推送数据库变更（开发环境）
+pnpm --filter @star-man/core db:push
+
+# 创建迁移文件（生产环境）
+pnpm --filter @star-man/core db:migrate
+```
+
+**备选方式（从 packages/core 目录）：**
 ```bash
 cd packages/core
 
 # 生成 Prisma 客户端
-pnpm run db:generate
+pnpm db:generate
 
-# 推送数据库变更（开发环境）
-pnpm run db:push
+# 推送数据库变更
+pnpm db:push
 
-# 创建迁移文件（生产环境）
-pnpm run db:migrate
+# 创建迁移文件
+pnpm db:migrate
 ```
+
+> 💡 **提示**：
+> - 推荐从项目根目录使用 `pnpm --filter` 方式，确保路径解析正确
+> - 从 `packages/core` 运行也可以工作，但 Prisma 的相对路径基于项目根目录
+> - 如遇到 `DATABASE_URL` 找不到的错误，请使用根目录方式
 
 ### 运行测试
 
