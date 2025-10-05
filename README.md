@@ -31,19 +31,40 @@
 
 ## 🚀 快速开始
 
-### 1. 环境要求
+### 方式一：一键初始化（推荐）
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/your-username/star-man.git
+cd star-man
+
+# 2. 运行初始化脚本
+pnpm setup
+```
+
+初始化脚本会自动完成：
+- ✅ 安装所有依赖
+- ✅ 创建 .env 配置文件（需手动填入 GitHub Token）
+- ✅ 生成 Prisma Client
+- ✅ 初始化数据库
+
+> 💡 **获取 GitHub Token**：访问 [GitHub Settings > Personal Access Tokens](https://github.com/settings/tokens)，创建新 token，至少需要 `public_repo` 权限。
+
+### 方式二：手动初始化
+
+#### 1. 环境要求
 
 - Node.js >= 18
 - pnpm >= 8
 - GitHub Personal Access Token
 
-### 2. 安装依赖
+#### 2. 安装依赖
 
 ```bash
 pnpm install
 ```
 
-### 3. 配置环境变量
+#### 3. 配置环境变量
 
 ```bash
 cp .env.example .env
@@ -55,23 +76,19 @@ cp .env.example .env
 # GitHub Personal Access Token（必需）
 GITHUB_TOKEN=your_github_token_here
 
-# 数据库路径（必需，SQLite 需要使用 file: 协议）
-DATABASE_URL=file:./data/star-man.db
+# 数据库路径（相对于项目根目录）
+DATABASE_URL=./packages/data/test.db
 
-# API 配置（可选，仅启动 API 时需要）
-API_PORT=3000
+# API 配置
+API_PORT=3801
 API_HOST=localhost
 ```
 
-> 💡 **获取 GitHub Token**：访问 [GitHub Settings > Personal Access Tokens](https://github.com/settings/tokens)，创建新 token，至少需要 `public_repo` 权限。
-
-### 4. 初始化数据库
+#### 4. 初始化数据库
 
 ```bash
-# 进入 core 包目录
-cd packages/core
-
 # 生成 Prisma Client
+cd packages/core
 pnpm db:generate
 
 # 创建数据库表结构
@@ -81,22 +98,25 @@ pnpm db:push
 cd ../..
 ```
 
-> ⚠️ **重要提示**：
-> - SQLite 数据库路径需要使用 `file:` 协议，例如 `DATABASE_URL=file:./data/star-man.db`
-> - 如果使用相对路径，请确保从正确的目录执行命令
-> - 首次运行 `db:push` 会自动创建数据库文件和表结构
+> ⚠️ **常见问题**：
+> - 如果提示找不到 `DATABASE_URL`，确保在项目根目录有 `.env` 文件
+> - 数据库路径使用简洁格式（如 `./packages/data/test.db`），会自动转换为 Prisma 需要的 `file:` 格式
 
-### 5. 构建项目
+### 启动开发服务器
+
+初始化完成后，运行开发服务器：
 
 ```bash
-# 构建所有核心包（core, cli, api）
-pnpm build
-
-# 或者单独构建
-pnpm --filter @star-man/core build
-pnpm --filter @star-man/cli build
-pnpm --filter @star-man/api build
+pnpm dev
 ```
+
+这会同时启动：
+- 🌐 **Web 界面**：http://localhost:5143
+- 🔌 **API 服务**：http://localhost:3801
+- 📚 **API 文档**：http://localhost:3801/api-docs
+- 🔧 **CLI 工具**：监听模式（修改代码自动重新编译）
+
+> **提示**：首次启动可能需要几秒钟编译 TypeScript
 
 ## 📖 使用指南
 
