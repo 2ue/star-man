@@ -55,8 +55,8 @@ cp .env.example .env
 # GitHub Personal Access Token（必需）
 GITHUB_TOKEN=your_github_token_here
 
-# 数据库路径（必需）
-DATABASE_URL=./data/star-man.db
+# 数据库路径（必需，SQLite 需要使用 file: 协议）
+DATABASE_URL=file:./data/star-man.db
 
 # API 配置（可选，仅启动 API 时需要）
 API_PORT=3000
@@ -68,13 +68,34 @@ API_HOST=localhost
 ### 4. 初始化数据库
 
 ```bash
-cd packages/core && pnpm run db:push
+# 进入 core 包目录
+cd packages/core
+
+# 生成 Prisma Client
+pnpm db:generate
+
+# 创建数据库表结构
+pnpm db:push
+
+# 返回项目根目录
+cd ../..
 ```
+
+> ⚠️ **重要提示**：
+> - SQLite 数据库路径需要使用 `file:` 协议，例如 `DATABASE_URL=file:./data/star-man.db`
+> - 如果使用相对路径，请确保从正确的目录执行命令
+> - 首次运行 `db:push` 会自动创建数据库文件和表结构
 
 ### 5. 构建项目
 
 ```bash
+# 构建所有核心包（core, cli, api）
 pnpm build
+
+# 或者单独构建
+pnpm --filter @star-man/core build
+pnpm --filter @star-man/cli build
+pnpm --filter @star-man/api build
 ```
 
 ## 📖 使用指南
@@ -282,7 +303,11 @@ star-man/
 
 **SQLite（推荐，默认）：**
 ```env
-DATABASE_URL=./data/star-man.db
+# 使用 file: 协议（推荐）
+DATABASE_URL=file:./data/star-man.db
+
+# 或使用绝对路径
+DATABASE_URL=file:/absolute/path/to/star-man.db
 ```
 
 **MySQL：**
@@ -295,6 +320,8 @@ DATABASE_URL=mysql://user:password@localhost:3306/star_man
 DATABASE_URL=postgresql://user:password@localhost:5432/star_man
 ```
 
+> 📝 **注意**：SQLite 数据库必须使用 `file:` 协议前缀，否则 Prisma 会报错。
+
 ## 🔍 故障排除
 
 ### 常见问题
@@ -305,7 +332,9 @@ DATABASE_URL=postgresql://user:password@localhost:5432/star_man
 
 **2. 数据库连接问题**
 - 检查 `DATABASE_URL` 配置是否正确
+- SQLite 必须使用 `file:` 协议前缀（例如：`file:./data/star-man.db`）
 - 确保数据库文件目录有写权限
+- 运行 `pnpm db:generate` 和 `pnpm db:push` 初始化数据库
 
 **3. 构建失败**
 - 确保 Node.js 版本 >= 18

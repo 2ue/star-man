@@ -1,4 +1,4 @@
-import { PrismaClient } from '../dist/generated/client';
+import { PrismaClient } from '@prisma/client';
 import { DatabaseConfig } from './types';
 
 export class Database {

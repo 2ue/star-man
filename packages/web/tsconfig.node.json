@@ -7,7 +7,8 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "target": "ES2018",
-    "lib": ["ES2018"]
+    "lib": ["ES2018"],
+    "outDir": "node_modules/.cache/tsc"
   },
   "include": ["vite.config.ts"]
 }

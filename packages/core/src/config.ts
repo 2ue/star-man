@@ -1,9 +1,47 @@
 import { config } from 'dotenv';
 import { Config } from './types';
 import { join, resolve, isAbsolute } from 'path';
+import { existsSync } from 'fs';
+
+// 查找项目根目录的 .env 文件
+function findEnvFile(): string | undefined {
+  // 策略1: 尝试当前工作目录
+  let envPath = join(process.cwd(), '.env');
+  if (existsSync(envPath)) {
+    return envPath;
+  }
+
+  // 策略2: 如果在 packages/* 目录，尝试根目录
+  if (process.cwd().includes('/packages/')) {
+    const rootDir = process.cwd().split('/packages/')[0];
+    envPath = join(rootDir, '.env');
+    if (existsSync(envPath)) {
+      return envPath;
+    }
+  }
+
+  // 策略3: 向上查找（最多3层）
+  let currentDir = process.cwd();
+  for (let i = 0; i < 3; i++) {
+    envPath = join(currentDir, '.env');
+    if (existsSync(envPath)) {
+      return envPath;
+    }
+    const parentDir = resolve(currentDir, '..');
+    if (parentDir === currentDir) break; // 到达文件系统根目录
+    currentDir = parentDir;
+  }
+
+  return undefined;
+}
 
 // 加载项目根目录的 .env 文件
-config({ path: join(process.cwd(), '.env') });
+const envPath = findEnvFile();
+if (envPath) {
+  config({ path: envPath });
+} else {
+  console.warn('⚠️  未找到 .env 文件，将使用环境变量');
+}
 
 /**
  * 将简洁的路径转换为 Prisma 需要的 file: URL 格式

@@ -13,14 +13,12 @@ pnpm-debug.log*
 
 # Build outputs
 dist/
-build/
-out/
-lib/
 .eslintcache
 
 # TypeScript
 *.tsbuildinfo
-tsconfig.tsbuildinfo
+vite.config.js
+vite.config.d.ts
 
 # Coverage
 coverage/
@@ -46,8 +44,6 @@ Thumbs.db
 # Monorepo packages
 packages/*/node_modules/
 packages/*/dist/
-packages/*/build/
-packages/*/out/
 
 # Tooling
 .turbo/
@@ -56,5 +52,11 @@ packages/*/out/
 .netlify/
 storybook-static/
 
-# Project data
-data/
+# Project data (only root level)
+/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# vscode
+.history
