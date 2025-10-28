@@ -230,6 +230,7 @@ export class StarManager {
       language,
       tags,
       search,
+      nameSearch,
       limit = 20,
       offset = 0,
       pushedAfter,
@@ -243,6 +244,8 @@ export class StarManager {
     } = options;
 
     console.log('🔍 Parsed options:', {
+      search,
+      nameSearch,
       minStars,
       maxStars,
       pushedAfter,
@@ -268,12 +271,31 @@ export class StarManager {
       where.language = language;
     }
 
+    // 分离的搜索条件
+    const searchConditions: any[] = [];
+
+    // 仓库名称搜索 - 新增
+    if (nameSearch) {
+      searchConditions.push(
+        { name: { contains: nameSearch } },
+        { fullName: { contains: nameSearch } }
+      );
+    }
+
+    // 描述关键词搜索 - 移除仓库名搜索
     if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
-        { fullName: { contains: search } }
-      ];
+      searchConditions.push({ description: { contains: search } });
+    }
+
+    // 如果有搜索条件，添加到where子句
+    if (searchConditions.length > 0) {
+      if (searchConditions.length === 1) {
+        // 单个搜索条件，直接使用AND
+        Object.assign(where, searchConditions[0]);
+      } else {
+        // 多个搜索条件，使用AND连接所有OR条件
+        where.AND = searchConditions.map(condition => ({ OR: [condition] }));
+      }
     }
 
     // 新增：Star数量范围筛选
@@ -354,22 +376,10 @@ export class StarManager {
         break;
       case 'relevance':
       default:
-        // 相关度排序：有搜索关键词时优先显示匹配的
-        if (search) {
-          orderBy = [
-            {
-              // 名称完全匹配的优先级最高
-              _relevance: {
-                fields: ['name'],
-                search: search,
-                sort: 'desc'
-              }
-            },
-            { starredAt: 'desc' } // 其次按收藏时间
-          ];
-        } else {
-          orderBy.starredAt = 'desc'; // 默认按收藏时间
-        }
+        // 相关度排序：按收藏时间倒序（最近收藏的优先）
+        // 移除了 _relevance 以确保 SQLite 兼容性
+        // _relevance 只在 PostgreSQL/MySQL 中支持，会导致 SQLite 500错误
+        orderBy.stargazersCount = 'desc'; // 按Star数倒序更���合"相关度"的直觉
         break;
     }
 

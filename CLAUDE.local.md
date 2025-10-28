@@ -177,3 +177,8 @@ claude mcp add --transport http grep https://mcp.grep.app
 ```bash
 claude mcp add spec-workflow-mcp -s user -- npx -y spec-workflow-mcp@latest
 ```
+
+### 文件/目录查询
+
+使用**filesystem** mcp工具进行查询目录或文件结构时，需要分析项目，排除不必要的目录，比如node_modules等依赖目录
+禁止直接读取所有无用的文件目录，读取目录需要保证是源码或者不是依赖相关的目录

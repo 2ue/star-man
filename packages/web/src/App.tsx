@@ -1,20 +1,14 @@
-import { Menu, Settings, ChevronLeft } from 'lucide-react'
+import { Menu, Settings } from 'lucide-react'
 import { Outlet, Link, useLocation } from '@tanstack/react-router'
-import { useState } from 'react'
 
 export default function App() {
   const location = useLocation()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const isActive = (path: string) => location.pathname === path
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed)
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className={`drawer ${sidebarCollapsed ? '' : 'lg:drawer-open'}`}>
+      <div className="drawer lg:drawer-open">
         <input id="app-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
           {/* 现代化顶部导航栏 - 更紧凑 */}
@@ -23,7 +17,8 @@ export default function App() {
               <label htmlFor="app-drawer" className="btn btn-ghost btn-sm lg:hidden bg-white/50 hover:bg-white/70">
                 <Menu size={16} />
               </label>
-              <div className="flex items-center gap-2">
+              {/* Logo - 只在移动端显示 */}
+              <div className="flex items-center gap-2 lg:hidden">
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <span className="text-white font-bold text-xs">S</span>
                 </div>
@@ -44,82 +39,63 @@ export default function App() {
           </main>
         </div>
 
-        {/* 现代化侧边栏 - 更紧凑 */}
+        {/* 现代化侧边栏 */}
         <aside className="drawer-side">
           <label htmlFor="app-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-          <div className={`min-h-full bg-white/80 backdrop-blur-md border-r border-white/20 transition-all duration-300 relative ${sidebarCollapsed ? 'w-16' : 'w-64'
-            }`}>
-            {/* 收起/展开按钮 - 确保在所有状态下都可见 */}
-            <button
-              onClick={toggleSidebar}
-              className={`absolute top-4 z-20 w-8 h-8 rounded-lg bg-white/90 hover:bg-white border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center group ${sidebarCollapsed ? 'right-1' : 'right-3'
-                }`}
-              title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
-            >
-              <ChevronLeft
-                size={16}
-                className={`text-gray-600 group-hover:text-gray-800 transition-all duration-200 ${sidebarCollapsed ? 'rotate-180' : ''}`}
-              />
-            </button>
-
-            <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'}`}>
-              {/* 侧边栏头部 */}
-              <div className={`mb-6 ${sidebarCollapsed ? 'text-center' : ''}`}>
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-2 mx-auto">
+          <div className="min-h-full bg-white/80 backdrop-blur-md border-r border-white/20 w-64">
+            <div className="p-4">
+              {/* Logo区域 - 始终显示 */}
+              <div className="mb-6">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-2">
                   <span className="text-white font-bold text-base">S</span>
                 </div>
-                {!sidebarCollapsed && (
-                  <>
-                    <h2 className="text-base font-semibold text-gray-800">Star‑Man</h2>
-                    <p className="text-xs text-gray-600">GitHub Star 管理工具</p>
-                  </>
-                )}
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Star‑Man</h2>
+                <p className="text-xs text-gray-600">GitHub Star 管理工具</p>
               </div>
 
+              {/* 导航菜单 */}
               <nav className="space-y-1">
-                {!sidebarCollapsed && (
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                    导航
-                  </div>
-                )}
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  导航
+                </div>
 
                 <Link
                   to="/"
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/')
-                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
-                    : 'text-gray-700 hover:bg-white/50'
-                    } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                  title={sidebarCollapsed ? '总览' : ''}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isActive('/')
+                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                      : 'text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="总览"
                 >
-                  <div className={`w-1.5 h-1.5 rounded-full ${isActive('/') ? 'bg-blue-500' : 'bg-gray-400'
-                    }`} />
-                  {!sidebarCollapsed && <span className="font-medium text-sm">总览</span>}
+                  <div className={`w-2 h-2 rounded-full ${isActive('/') ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                  <span className="font-medium text-sm">总览</span>
                 </Link>
 
                 <Link
                   to="/repos"
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/repos')
-                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
-                    : 'text-gray-700 hover:bg-white/50'
-                    } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                  title={sidebarCollapsed ? '仓库' : ''}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isActive('/repos')
+                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                      : 'text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="仓库"
                 >
-                  <div className={`w-1.5 h-1.5 rounded-full ${isActive('/repos') ? 'bg-blue-500' : 'bg-gray-400'
-                    }`} />
-                  {!sidebarCollapsed && <span className="font-medium text-sm">仓库</span>}
+                  <div className={`w-2 h-2 rounded-full ${isActive('/repos') ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                  <span className="font-medium text-sm">仓库</span>
                 </Link>
 
                 <Link
                   to="/sync"
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive('/sync')
-                    ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
-                    : 'text-gray-700 hover:bg-white/50'
-                    } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                  title={sidebarCollapsed ? '同步' : ''}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isActive('/sync')
+                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                      : 'text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="同步"
                 >
-                  <div className={`w-1.5 h-1.5 rounded-full ${isActive('/sync') ? 'bg-blue-500' : 'bg-gray-400'
-                    }`} />
-                  {!sidebarCollapsed && <span className="font-medium text-sm">同步</span>}
+                  <div className={`w-2 h-2 rounded-full ${isActive('/sync') ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                  <span className="font-medium text-sm">同步</span>
                 </Link>
               </nav>
             </div>

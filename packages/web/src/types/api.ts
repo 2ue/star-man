@@ -65,7 +65,8 @@ export interface RepoQuery {
   category?: string
   language?: string
   tags?: string
-  search?: string
+  search?: string          // 描述关键词搜索（移除仓库名搜索）
+  nameSearch?: string      // 新增：仓库名称模糊搜索
   limit?: number
   offset?: number
 

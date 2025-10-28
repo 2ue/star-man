@@ -6,7 +6,8 @@ import type { RepoQuery, RepoFilters } from '../types/api'
 import Pagination from '../components/Pagination'
 
 export default function Repos() {
-  const [filters, setFilters] = useState<RepoFilters>({
+  // 分离UI状态和查询状态
+  const [uiFilters, setUiFilters] = useState<RepoFilters>({
     limit: 20,
     offset: 0,
     // 新增筛选状态
@@ -17,20 +18,33 @@ export default function Repos() {
     sort: 'relevance',
     order: 'desc'
   })
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')           // 描述关键词搜索
+  const [nameSearchTerm, setNameSearchTerm] = useState('')   // 仓库名称搜索
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
-  // 构建API查询参数
-  const apiFilters: RepoQuery = {
-    ...filters,
-    search: searchTerm || undefined
-  }
+  // 实际用于API查询的参数
+  const [queryFilters, setQueryFilters] = useState<RepoQuery>({
+    limit: 20,
+    offset: 0,
+    sort: 'relevance',
+    order: 'desc'
+  })
+  const [querySearchTerm, setQuerySearchTerm] = useState<string>('')
+  const [queryNameSearchTerm, setQueryNameSearchTerm] = useState<string>('')
 
   const { data: reposData, isLoading, error } = useQuery({
-    queryKey: ['repos', apiFilters],
+    queryKey: ['repos', queryFilters, querySearchTerm, queryNameSearchTerm],
     queryFn: () => {
-      console.log('🚀 API调用参数:', apiFilters)
-      return fetchRepos(apiFilters)
+      console.log('🚀 API调用参数:', {
+        ...queryFilters,
+        search: querySearchTerm || undefined,
+        nameSearch: queryNameSearchTerm || undefined
+      })
+      return fetchRepos({
+        ...queryFilters,
+        search: querySearchTerm || undefined,
+        nameSearch: queryNameSearchTerm || undefined
+      })
     },
     keepPreviousData: true,
   })
@@ -55,35 +69,54 @@ export default function Repos() {
   }
 
   const handleSearch = () => {
-    const timeRanges = getTimeRangeDates(filters.pushedTimeRange || '')
-    const updateTimeRanges = getTimeRangeDates(filters.updatedTimeRange || '')
+    const timeRanges = getTimeRangeDates(uiFilters.pushedTimeRange || '')
+    const updateTimeRanges = getTimeRangeDates(uiFilters.updatedTimeRange || '')
 
-    const searchFilters = {
-      ...filters,
-      pushedAfter: timeRanges.start?.toISOString(),
-      pushedBefore: timeRanges.end?.toISOString(),
-      updatedAfter: updateTimeRanges.start?.toISOString(),
-      updatedBefore: updateTimeRanges.end?.toISOString(),
-      offset: 0 // 重置到第一页
+    // 构建查询参数，只包含后端API期望的字段
+    const newQueryFilters: RepoQuery = {
+      limit: uiFilters.limit,
+      offset: 0, // 重置到第一页
+      category: uiFilters.category,
+      language: uiFilters.language,
+      tags: uiFilters.tags,
+      minStars: uiFilters.minStars,
+      maxStars: uiFilters.maxStars,
+      sort: uiFilters.sort,
+      order: uiFilters.order,
+      // 只有当时间范围选择有效时才添加时间参数
+      ...(uiFilters.pushedTimeRange && {
+        pushedAfter: timeRanges.start?.toISOString(),
+        pushedBefore: timeRanges.end?.toISOString()
+      }),
+      ...(uiFilters.updatedTimeRange && {
+        updatedAfter: updateTimeRanges.start?.toISOString(),
+        updatedBefore: updateTimeRanges.end?.toISOString()
+      })
     }
 
     // 调试：输出实际的API查询参数
-    console.log('🔍 搜索参数:', searchFilters)
+    console.log('🔍 搜索参数:', newQueryFilters)
     console.log('📅 时间范围转换:', {
-      pushedTimeRange: filters.pushedTimeRange,
+      pushedTimeRange: uiFilters.pushedTimeRange,
       pushedAfter: timeRanges.start?.toISOString(),
       pushedBefore: timeRanges.end?.toISOString(),
-      updatedTimeRange: filters.updatedTimeRange,
+      updatedTimeRange: uiFilters.updatedTimeRange,
       updatedAfter: updateTimeRanges.start?.toISOString(),
       updatedBefore: updateTimeRanges.end?.toISOString()
     })
 
-    setFilters(searchFilters)
+    setQueryFilters(newQueryFilters)
+    setQuerySearchTerm(searchTerm)
+    setQueryNameSearchTerm(nameSearchTerm)
+
+    // 同时更新UI筛选器以保持同步
+    setUiFilters(prev => ({ ...prev, offset: 0 }))
   }
 
   const handleReset = () => {
     setSearchTerm('')
-    setFilters({
+    setNameSearchTerm('')
+    setUiFilters({
       limit: 20,
       offset: 0,
       // 重置所有筛选条件
@@ -94,10 +127,22 @@ export default function Repos() {
       sort: 'relevance',
       order: 'desc'
     })
+    setQueryFilters({
+      limit: 20,
+      offset: 0,
+      sort: 'relevance',
+      order: 'desc'
+    })
+    setQuerySearchTerm('')
+    setQueryNameSearchTerm('')
   }
 
   const handlePageChange = (newOffset: number) => {
-    setFilters(prev => ({
+    setUiFilters(prev => ({
+      ...prev,
+      offset: newOffset,
+    }))
+    setQueryFilters(prev => ({
       ...prev,
       offset: newOffset,
     }))
@@ -141,15 +186,30 @@ export default function Repos() {
             <h2 className="text-lg font-semibold text-gray-800">筛选条件</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            {/* 搜索关键词 - 特殊样式 */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+            {/* 仓库名称搜索 */}
             <div className="space-y-2">
-              <label className="text-xs font-medium text-gray-700">搜索关键词</label>
+              <label className="text-xs font-medium text-gray-700">仓库名称</label>
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   className="w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
-                  placeholder="仓库名称、描述..."
+                  placeholder="仓库名称模糊搜索..."
+                  value={nameSearchTerm}
+                  onChange={(e) => setNameSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                />
+              </div>
+            </div>
+
+            {/* 描述关键词搜索 */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-gray-700">描述关键词</label>
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  placeholder="描述中的关键词..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -163,8 +223,8 @@ export default function Repos() {
               <input
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                 placeholder="JavaScript, Python..."
-                value={filters.language || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, language: e.target.value || undefined }))}
+                value={uiFilters.language || ''}
+                onChange={(e) => setUiFilters(prev => ({ ...prev, language: e.target.value || undefined }))}
               />
             </div>
 
@@ -174,8 +234,8 @@ export default function Repos() {
               <input
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                 placeholder="Backend, Frontend..."
-                value={filters.category || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value || undefined }))}
+                value={uiFilters.category || ''}
+                onChange={(e) => setUiFilters(prev => ({ ...prev, category: e.target.value || undefined }))}
               />
             </div>
 
@@ -185,8 +245,8 @@ export default function Repos() {
               <input
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                 placeholder="react, vue, node..."
-                value={filters.tags || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, tags: e.target.value || undefined }))}
+                value={uiFilters.tags || ''}
+                onChange={(e) => setUiFilters(prev => ({ ...prev, tags: e.target.value || undefined }))}
               />
             </div>
 
@@ -199,16 +259,16 @@ export default function Repos() {
                   placeholder="最小Star数"
                   type="number"
                   min="0"
-                  value={filters.minStars || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, minStars: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  value={uiFilters.minStars || ''}
+                  onChange={(e) => setUiFilters(prev => ({ ...prev, minStars: e.target.value ? parseInt(e.target.value) : undefined }))}
                 />
                 <input
                   className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                   placeholder="最大Star数"
                   type="number"
                   min="0"
-                  value={filters.maxStars || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, maxStars: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  value={uiFilters.maxStars || ''}
+                  onChange={(e) => setUiFilters(prev => ({ ...prev, maxStars: e.target.value ? parseInt(e.target.value) : undefined }))}
                 />
               </div>
             </div>
@@ -218,8 +278,8 @@ export default function Repos() {
               <label className="text-xs font-medium text-gray-700">最后活跃时间</label>
               <select
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm"
-                value={filters.pushedTimeRange || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, pushedTimeRange: e.target.value || undefined }))}
+                value={uiFilters.pushedTimeRange || ''}
+                onChange={(e) => setUiFilters(prev => ({ ...prev, pushedTimeRange: e.target.value || undefined }))}
               >
                 <option value="">全部时间</option>
                 <option value="1w">最近一周</option>
@@ -235,8 +295,8 @@ export default function Repos() {
               <label className="text-xs font-medium text-gray-700">元数据更新时间</label>
               <select
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm"
-                value={filters.updatedTimeRange || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, updatedTimeRange: e.target.value || undefined }))}
+                value={uiFilters.updatedTimeRange || ''}
+                onChange={(e) => setUiFilters(prev => ({ ...prev, updatedTimeRange: e.target.value || undefined }))}
               >
                 <option value="">全部时间</option>
                 <option value="1w">最近一周</option>
@@ -271,8 +331,12 @@ export default function Repos() {
                 <span className="text-xs text-gray-600">排序:</span>
                 <select
                   className="px-3 py-2 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
-                  value={filters.sort || 'relevance'}
-                  onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value as any }))}
+                  value={uiFilters.sort || 'relevance'}
+                  onChange={(e) => {
+                    const newSort = e.target.value as any
+                    setUiFilters(prev => ({ ...prev, sort: newSort }))
+                    setQueryFilters(prev => ({ ...prev, sort: newSort, offset: 0 }))
+                  }}
                 >
                   <option value="relevance">相关度</option>
                   <option value="stars">Star数</option>
@@ -288,8 +352,11 @@ export default function Repos() {
                 <span className="text-xs text-gray-600">方向:</span>
                 <div className="flex bg-gray-100 rounded-lg p-1">
                   <button
-                    onClick={() => setFilters(prev => ({ ...prev, order: 'asc' }))}
-                    className={`p-1.5 rounded-md transition-colors ${filters.order === 'asc'
+                    onClick={() => {
+                      setUiFilters(prev => ({ ...prev, order: 'asc' }))
+                      setQueryFilters(prev => ({ ...prev, order: 'asc', offset: 0 }))
+                    }}
+                    className={`p-1.5 rounded-md transition-colors ${uiFilters.order === 'asc'
                       ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                       }`}
@@ -300,8 +367,11 @@ export default function Repos() {
                     </svg>
                   </button>
                   <button
-                    onClick={() => setFilters(prev => ({ ...prev, order: 'desc' }))}
-                    className={`p-1.5 rounded-md transition-colors ${filters.order === 'desc'
+                    onClick={() => {
+                      setUiFilters(prev => ({ ...prev, order: 'desc' }))
+                      setQueryFilters(prev => ({ ...prev, order: 'desc', offset: 0 }))
+                    }}
+                    className={`p-1.5 rounded-md transition-colors ${uiFilters.order === 'desc'
                       ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                       }`}
@@ -370,7 +440,7 @@ export default function Repos() {
                 共找到 <span className="text-blue-600 font-bold">{reposData?.total || 0}</span> 个仓库
               </div>
               <div className="text-sm text-gray-600">
-                第 {Math.floor((filters.offset || 0) / (filters.limit || 20)) + 1} 页
+                第 {Math.floor((uiFilters.offset || 0) / (uiFilters.limit || 20)) + 1} 页
               </div>
             </div>
 
@@ -449,11 +519,16 @@ export default function Repos() {
             {reposData?.pagination && (
               <Pagination
                 total={reposData.total || 0}
-                limit={filters.limit || 20}
-                offset={filters.offset || 0}
+                limit={uiFilters.limit || 20}
+                offset={uiFilters.offset || 0}
                 onPageChange={handlePageChange}
                 onLimitChange={(newLimit) => {
-                  setFilters(prev => ({
+                  setUiFilters(prev => ({
+                    ...prev,
+                    limit: newLimit,
+                    offset: 0 // 重置到第一页
+                  }))
+                  setQueryFilters(prev => ({
                     ...prev,
                     limit: newLimit,
                     offset: 0 // 重置到第一页

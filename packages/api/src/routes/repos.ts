@@ -11,6 +11,7 @@ export function createReposRouter(starManager: StarManager): Router {
     query('language').optional().isString(),
     query('tags').optional().isString(),
     query('search').optional().isString(),
+    query('nameSearch').optional().isString(),
     query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
     query('offset').optional().isInt({ min: 0 }).toInt(),
     // 新增参数验证
@@ -34,6 +35,7 @@ export function createReposRouter(starManager: StarManager): Router {
         language: req.query.language as string,
         tags: req.query.tags ? (req.query.tags as string).split(',').map(t => t.trim()) : undefined,
         search: req.query.search as string,
+        nameSearch: req.query.nameSearch as string,
         limit: parseInt(req.query.limit as string) || 20,
         offset: parseInt(req.query.offset as string) || 0,
         // 新增参数
