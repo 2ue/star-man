@@ -4,9 +4,19 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchRepos } from '../lib/api'
 import type { RepoQuery, RepoFilters } from '../types/api'
 import Pagination from '../components/Pagination'
+import { useSearch } from '@tanstack/react-router'
 
 export default function Repos() {
-  // 分离UI状态和查询状态
+  // 获取 URL 搜索参数
+  const searchParams = useSearch({ from: '/repos' }) as {
+    category?: string
+    language?: string
+    tags?: string
+    search?: string
+    nameSearch?: string
+  }
+
+  // 分离UI状态和查询状态 - 初始化时直接从 URL 参数获取
   const [uiFilters, setUiFilters] = useState<RepoFilters>({
     limit: 20,
     offset: 0,
@@ -16,21 +26,29 @@ export default function Repos() {
     pushedTimeRange: undefined,
     updatedTimeRange: undefined,
     sort: 'relevance',
-    order: 'desc'
+    order: 'desc',
+    // 从 URL 参数初始化筛选条件
+    category: searchParams.category,
+    language: searchParams.language,
+    tags: searchParams.tags,
   })
-  const [searchTerm, setSearchTerm] = useState('')           // 描述关键词搜索
-  const [nameSearchTerm, setNameSearchTerm] = useState('')   // 仓库名称搜索
+  const [searchTerm, setSearchTerm] = useState(searchParams.search || '')           // 描述关键词搜索
+  const [nameSearchTerm, setNameSearchTerm] = useState(searchParams.nameSearch || '')   // 仓库名称搜索
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
-  // 实际用于API查询的参数
+  // 实际用于API查询的参数 - 初始化时直接从 URL 参数获取
   const [queryFilters, setQueryFilters] = useState<RepoQuery>({
     limit: 20,
     offset: 0,
     sort: 'relevance',
-    order: 'desc'
+    order: 'desc',
+    // 从 URL 参数初始化查询条件
+    category: searchParams.category,
+    language: searchParams.language,
+    tags: searchParams.tags,
   })
-  const [querySearchTerm, setQuerySearchTerm] = useState<string>('')
-  const [queryNameSearchTerm, setQueryNameSearchTerm] = useState<string>('')
+  const [querySearchTerm, setQuerySearchTerm] = useState<string>(searchParams.search || '')
+  const [queryNameSearchTerm, setQueryNameSearchTerm] = useState<string>(searchParams.nameSearch || '')
 
   const { data: reposData, isLoading, error } = useQuery({
     queryKey: ['repos', queryFilters, querySearchTerm, queryNameSearchTerm],
@@ -47,6 +65,7 @@ export default function Repos() {
       })
     },
     keepPreviousData: true,
+    enabled: true, // 总是启用查询
   })
 
   // 时间范围转换函数
