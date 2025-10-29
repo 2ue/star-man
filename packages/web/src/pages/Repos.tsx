@@ -212,7 +212,9 @@ export default function Repos() {
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
-                  className="w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  className={`w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                    nameSearchTerm ? 'text-gray-900 font-medium' : 'text-gray-500'
+                  }`}
                   placeholder="仓库名称模糊搜索..."
                   value={nameSearchTerm}
                   onChange={(e) => setNameSearchTerm(e.target.value)}
@@ -227,7 +229,9 @@ export default function Repos() {
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
-                  className="w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  className={`w-full pl-10 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                    searchTerm ? 'text-gray-900 font-medium' : 'text-gray-500'
+                  }`}
                   placeholder="描述中的关键词..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -240,7 +244,9 @@ export default function Repos() {
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-700">编程语言</label>
               <input
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                  uiFilters.language ? 'text-gray-900 font-medium' : 'text-gray-500'
+                }`}
                 placeholder="JavaScript, Python..."
                 value={uiFilters.language || ''}
                 onChange={(e) => setUiFilters(prev => ({ ...prev, language: e.target.value || undefined }))}
@@ -251,7 +257,9 @@ export default function Repos() {
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-700">分类</label>
               <input
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                  uiFilters.category ? 'text-gray-900 font-medium' : 'text-gray-500'
+                }`}
                 placeholder="Backend, Frontend..."
                 value={uiFilters.category || ''}
                 onChange={(e) => setUiFilters(prev => ({ ...prev, category: e.target.value || undefined }))}
@@ -262,7 +270,9 @@ export default function Repos() {
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-700">标签</label>
               <input
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                  uiFilters.tags ? 'text-gray-900 font-medium' : 'text-gray-500'
+                }`}
                 placeholder="react, vue, node..."
                 value={uiFilters.tags || ''}
                 onChange={(e) => setUiFilters(prev => ({ ...prev, tags: e.target.value || undefined }))}
@@ -274,7 +284,9 @@ export default function Repos() {
               <label className="text-xs font-medium text-gray-700">Star数量范围</label>
               <div className="flex gap-2">
                 <input
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                    uiFilters.minStars !== undefined ? 'text-gray-900 font-medium' : 'text-gray-500'
+                  }`}
                   placeholder="最小Star数"
                   type="number"
                   min="0"
@@ -282,7 +294,9 @@ export default function Repos() {
                   onChange={(e) => setUiFilters(prev => ({ ...prev, minStars: e.target.value ? parseInt(e.target.value) : undefined }))}
                 />
                 <input
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                  className={`w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400 ${
+                    uiFilters.maxStars !== undefined ? 'text-gray-900 font-medium' : 'text-gray-500'
+                  }`}
                   placeholder="最大Star数"
                   type="number"
                   min="0"
