@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchTagsStats } from '../lib/api'
 import { useNavigate } from '@tanstack/react-router'
 import ReactWordcloud from 'react-wordcloud'
-import 'tippy.js/dist/tippy.css'
-import 'tippy.js/animations/scale.css'
 
 export default function TagsCloud() {
   const navigate = useNavigate()

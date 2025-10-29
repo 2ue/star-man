@@ -1,59 +1,40 @@
 import { Search, Grid, List, Star, GitFork, ExternalLink, Tag, FolderOpen, SlidersHorizontal } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchRepos } from '../lib/api'
 import type { RepoQuery, RepoFilters } from '../types/api'
 import Pagination from '../components/Pagination'
 import { useSearch } from '@tanstack/react-router'
-import tippy from 'tippy.js'
-import 'tippy.js/dist/tippy.css'
 
-// 更多标签tooltip组件
-function MoreTagsTooltip({ tags, remainingCount }: { tags: string[], remainingCount: number }) {
-  const buttonRef = useRef<HTMLSpanElement>(null)
-
-  useEffect(() => {
-    if (buttonRef.current && tags.length > 0) {
-      // 构建tooltip内容
-      const tooltipContent = `
-        <div class="text-left">
-          <div class="text-xs font-medium text-gray-700 mb-2">所有标签 (${tags.length + 3}个):</div>
-          <div class="flex flex-wrap gap-1">
-            ${tags.map(tag => `
-              <span class="inline-block px-2 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200">
-                ${tag}
+// 更多标签dropdown组件（使用DaisyUI）
+function MoreTagsDropdown({ tags, remainingCount }: { tags: string[], remainingCount: number }) {
+  return (
+    <div className="dropdown dropdown-left">
+      <div
+        tabIndex={0}
+        role="button"
+        className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+      >
+        +{remainingCount}
+      </div>
+      <div tabIndex={0} className="dropdown-content menu bg-white border border-gray-200 rounded-lg shadow-lg p-3 w-80 z-50 dropdown-start">
+        <div className="text-left">
+          <div className="text-xs font-medium text-gray-700 mb-2">
+            所有标签 ({tags.length + 3}个)
+          </div>
+          <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
+            {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200"
+              >
+                {tag}
               </span>
-            `).join('')}
+            ))}
           </div>
         </div>
-      `
-
-      const instance = tippy(buttonRef.current, {
-        content: tooltipContent,
-        allowHTML: true,
-        interactive: true,
-        theme: 'light',
-        animation: 'scale',
-        placement: 'top',
-        arrow: true,
-        appendTo: document.body,
-        maxWidth: 300,
-      })
-
-      return () => {
-        instance.destroy()
-      }
-    }
-  }, [tags])
-
-  return (
-    <span
-      ref={buttonRef}
-      className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 cursor-help hover:bg-gray-200 transition-colors"
-      title={`查看剩余 ${remainingCount} 个标签`}
-    >
-      +{remainingCount}
-    </span>
+      </div>
+    </div>
   )
 }
 
@@ -589,7 +570,7 @@ export default function Repos() {
                             </span>
                           ))}
                           {repo.tags.length > 3 && (
-                            <MoreTagsTooltip
+                            <MoreTagsDropdown
                               tags={repo.tags.slice(3)}
                               remainingCount={repo.tags.length - 3}
                             />
