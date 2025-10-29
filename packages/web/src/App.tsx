@@ -86,6 +86,32 @@ export default function App() {
                 </Link>
 
                 <Link
+                  to="/tags"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isActive('/tags')
+                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                      : 'text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="标签云"
+                >
+                  <div className={`w-2 h-2 rounded-full ${isActive('/tags') ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                  <span className="font-medium text-sm">标签云</span>
+                </Link>
+
+                <Link
+                  to="/categories"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isActive('/categories')
+                      ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-700'
+                      : 'text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="分类"
+                >
+                  <div className={`w-2 h-2 rounded-full ${isActive('/categories') ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                  <span className="font-medium text-sm">分类</span>
+                </Link>
+
+                <Link
                   to="/sync"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActive('/sync')

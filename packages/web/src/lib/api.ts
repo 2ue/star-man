@@ -87,3 +87,15 @@ export const updateRepoCategory = async (repoId: number, category: string): Prom
   const response = await http.put(`/api/repos/${repoId}/category`, { category })
   return response.data
 }
+
+// 获取所有标签统计（用于词云）
+export const fetchTagsStats = async (): Promise<import('../types/api').TagStat[]> => {
+  const response = await http.get<import('../types/api').TagStat[]>('/api/stats/tags')
+  return response.data
+}
+
+// 获取所有分类统计
+export const fetchCategoriesStats = async (): Promise<import('../types/api').CategoryStat[]> => {
+  const response = await http.get<import('../types/api').CategoryStat[]>('/api/stats/categories')
+  return response.data
+}

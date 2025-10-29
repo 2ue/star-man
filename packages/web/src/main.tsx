@@ -7,6 +7,8 @@ import { createRootRoute, createRoute, createRouter, RouterProvider } from '@tan
 import Dashboard from './pages/Dashboard.tsx'
 import Repos from './pages/Repos.tsx'
 import SyncPage from './pages/Sync.tsx'
+import TagsCloud from './pages/TagsCloud.tsx'
+import Categories from './pages/Categories.tsx'
 
 const queryClient = new QueryClient()
 
@@ -32,7 +34,19 @@ const syncRoute = createRoute({
   component: () => <SyncPage />,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, reposRoute, syncRoute])
+const tagsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'tags',
+  component: () => <TagsCloud />,
+})
+
+const categoriesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'categories',
+  component: () => <Categories />,
+})
+
+const routeTree = rootRoute.addChildren([indexRoute, reposRoute, syncRoute, tagsRoute, categoriesRoute])
 const router = createRouter({ routeTree })
 
 declare module '@tanstack/react-router' {
