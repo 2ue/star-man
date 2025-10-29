@@ -177,3 +177,63 @@ html, body, #root {
 .card-large {
   @apply p-6;
 }
+
+/* 词云 tooltip 样式改进 - 使用白色背景 */
+.tippy-box {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(102, 126, 234, 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  color: #1f2937 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 8px 12px !important;
+  max-width: 300px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.tippy-box[data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.tippy-box[data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.tippy-box[data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.tippy-box[data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 深色模式下的 tooltip 样式 - 白色背景 */
+.dark .tippy-box {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #1f2937 !important;
+  border-color: rgba(102, 126, 234, 0.3) !important;
+}
+
+.dark .tippy-box[data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dark .tippy-box[data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dark .tippy-box[data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dark .tippy-box[data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 悬停时的微动画效果 - 白色背景阴影 */
+.tippy-box:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+}

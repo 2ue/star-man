@@ -1,8 +1,11 @@
-import { Activity, ListTree, Star, GitFork, Tag, TrendingUp, Users, Calendar } from 'lucide-react'
+import { Activity, ListTree, Star, GitFork, Tag, TrendingUp, Users, Calendar, ExternalLink } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchStats } from '../lib/api'
+import { useNavigate } from '@tanstack/react-router'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
+
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['stats'],
     queryFn: fetchStats,
@@ -178,9 +181,13 @@ export default function Dashboard() {
                     <span className="text-xs text-gray-500">
                       还有 {stats.categories.length - 6} 个分类未显示
                     </span>
-                    <div className="text-xs text-blue-600 mt-1">
+                    <button
+                      onClick={() => navigate({ to: '/repos' })}
+                      className="text-xs text-blue-600 hover:text-blue-800 mt-1 flex items-center gap-1 mx-auto transition-colors group"
+                    >
                       完整数据请查看仓库管理页面
-                    </div>
+                      <ExternalLink size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                   </div>
                 </div>
               )}
@@ -226,9 +233,13 @@ export default function Dashboard() {
                     <span className="text-xs text-gray-500">
                       还有 {stats.languages.length - 6} 种语言未显示
                     </span>
-                    <div className="text-xs text-blue-600 mt-1">
+                    <button
+                      onClick={() => navigate({ to: '/repos' })}
+                      className="text-xs text-blue-600 hover:text-blue-800 mt-1 flex items-center gap-1 mx-auto transition-colors group"
+                    >
                       完整数据请查看仓库管理页面
-                    </div>
+                      <ExternalLink size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                   </div>
                 </div>
               )}

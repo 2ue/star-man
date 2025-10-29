@@ -109,6 +109,7 @@ importers:
       '@tanstack/react-router': ^1.16.6
       '@types/react': ^18.2.43
       '@types/react-dom': ^18.2.17
+      '@types/tippy.js': ^6.3.0
       '@typescript-eslint/eslint-plugin': ^6.17.0
       '@typescript-eslint/parser': ^6.17.0
       '@vitejs/plugin-react': ^4.2.1
@@ -130,11 +131,13 @@ importers:
       react-wordcloud: ^1.2.7
       tailwind-merge: ^2.2.0
       tailwindcss: ^3.3.6
+      tippy.js: ^6.3.7
       typescript: ^5.3.3
       vite: ^5.0.8
     dependencies:
       '@tanstack/react-query': 4.40.1_nnrd3gsncyragczmpvfhocinkq
       '@tanstack/react-router': 1.131.27_nnrd3gsncyragczmpvfhocinkq
+      '@types/tippy.js': 6.3.0
       axios: 1.11.0
       class-variance-authority: 0.7.1
       clsx: 2.1.1
@@ -145,6 +148,7 @@ importers:
       react-dom: 18.3.1_react@18.3.1
       react-wordcloud: 1.2.7_react@18.3.1
       tailwind-merge: 2.6.0
+      tippy.js: 6.3.7
     devDependencies:
       '@eslint/js': 8.57.1
       '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.4.17
@@ -1752,6 +1756,10 @@ packages:
     dependencies:
       '@types/node': 20.19.11
     dev: true
+
+  /@types/tippy.js/6.3.0:
+    resolution: {integrity: sha512-OYontJ7KwB9ijDusNOk3r1uArk35J5lOZ6Mq85L6Y9LTkiLi+GX49Q6Y8bI6DKfSE70Z+B54nUirBpudCkO+Dw==}
+    dev: false
 
   /@types/yargs-parser/21.0.3:
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}

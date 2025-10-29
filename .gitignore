@@ -60,3 +60,6 @@ storybook-static/
 
 # vscode
 .history
+
+# 临时的给AI生成文档的地方
+./temp/docs
