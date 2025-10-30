@@ -19,9 +19,9 @@ export function createReposRouter(starManager: StarManager): Router {
     query('maxStars').optional().isInt({ min: 0 }).toInt(),
     query('pushedAfter').optional().isISO8601(),
     query('pushedBefore').optional().isISO8601(),
-    query('updatedAfter').optional().isISO8601(),
-    query('updatedBefore').optional().isISO8601(),
-    query('sort').optional().isIn(['relevance', 'stars', 'forks', 'pushed', 'updated', 'created']),
+    query('starredAfter').optional().isISO8601(),
+    query('starredBefore').optional().isISO8601(),
+    query('sort').optional().isIn(['starred', 'stars', 'pushed']),
     query('order').optional().isIn(['asc', 'desc']),
   ], async (req: Request, res: Response) => {
     try {
@@ -43,9 +43,9 @@ export function createReposRouter(starManager: StarManager): Router {
         maxStars: req.query.maxStars ? parseInt(req.query.maxStars as string) : undefined,
         pushedAfter: req.query.pushedAfter as string,
         pushedBefore: req.query.pushedBefore as string,
-        updatedAfter: req.query.updatedAfter as string,
-        updatedBefore: req.query.updatedBefore as string,
-        sort: (req.query.sort as any) || 'relevance',
+        starredAfter: req.query.starredAfter as string,
+        starredBefore: req.query.starredBefore as string,
+        sort: (req.query.sort as any) || 'starred',
         order: (req.query.order as any) || 'desc',
       };
 

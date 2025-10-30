@@ -74,15 +74,15 @@ export interface RepoQuery {
   // 时间筛选
   pushedAfter?: string      // 最后活跃时间范围开始
   pushedBefore?: string     // 最后活跃时间范围结束
-  updatedAfter?: string     // 元数据更新时间范围开始
-  updatedBefore?: string    // 元数据更新时间范围结束
+  starredAfter?: string     // Star时间范围开始
+  starredBefore?: string    // Star时间范围结束
 
   // 数量筛选
   minStars?: number         // 最小Star数
   maxStars?: number         // 最大Star数
 
   // 排序
-  sort?: 'relevance' | 'stars' | 'forks' | 'pushed' | 'updated' | 'created'
+  sort?: 'starred' | 'stars' | 'pushed'
   order?: 'asc' | 'desc'
 }
 
@@ -90,7 +90,7 @@ export interface RepoQuery {
 export interface RepoFilters extends RepoQuery {
   // 临时的UI字段，用于时间范围选择
   pushedTimeRange?: string  // 最后活跃时间范围选择
-  updatedTimeRange?: string // 元数据更新时间范围选择
+  starredTimeRange?: string // Star时间范围选择
 }
 
 // 同步类型

@@ -47,6 +47,7 @@ model StarredRepo {
   @@index([isStarred])
   @@index([category])
   @@index([syncAt])
+  @@index([starredAt])
 }
 
 model SyncHistory {

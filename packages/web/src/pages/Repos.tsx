@@ -80,8 +80,8 @@ export default function Repos() {
     minStars: undefined,
     maxStars: undefined,
     pushedTimeRange: undefined,
-    updatedTimeRange: undefined,
-    sort: 'relevance',
+    starredTimeRange: undefined,
+    sort: 'starred',
     order: 'desc',
     // 从 URL 参数初始化筛选条件
     category: searchParams.category,
@@ -96,7 +96,7 @@ export default function Repos() {
   const [queryFilters, setQueryFilters] = useState<RepoQuery>({
     limit: 20,
     offset: 0,
-    sort: 'relevance',
+    sort: 'starred',
     order: 'desc',
     // 从 URL 参数初始化查询条件
     category: searchParams.category,
@@ -145,7 +145,7 @@ export default function Repos() {
 
   const handleSearch = () => {
     const timeRanges = getTimeRangeDates(uiFilters.pushedTimeRange || '')
-    const updateTimeRanges = getTimeRangeDates(uiFilters.updatedTimeRange || '')
+    const starredTimeRanges = getTimeRangeDates(uiFilters.starredTimeRange || '')
 
     // 构建查询参数，只包含后端API期望的字段
     const newQueryFilters: RepoQuery = {
@@ -163,9 +163,9 @@ export default function Repos() {
         pushedAfter: timeRanges.start?.toISOString(),
         pushedBefore: timeRanges.end?.toISOString()
       }),
-      ...(uiFilters.updatedTimeRange && {
-        updatedAfter: updateTimeRanges.start?.toISOString(),
-        updatedBefore: updateTimeRanges.end?.toISOString()
+      ...(uiFilters.starredTimeRange && {
+        starredAfter: starredTimeRanges.start?.toISOString(),
+        starredBefore: starredTimeRanges.end?.toISOString()
       })
     }
 
@@ -175,9 +175,9 @@ export default function Repos() {
       pushedTimeRange: uiFilters.pushedTimeRange,
       pushedAfter: timeRanges.start?.toISOString(),
       pushedBefore: timeRanges.end?.toISOString(),
-      updatedTimeRange: uiFilters.updatedTimeRange,
-      updatedAfter: updateTimeRanges.start?.toISOString(),
-      updatedBefore: updateTimeRanges.end?.toISOString()
+      starredTimeRange: uiFilters.starredTimeRange,
+      starredAfter: starredTimeRanges.start?.toISOString(),
+      starredBefore: starredTimeRanges.end?.toISOString()
     })
 
     setQueryFilters(newQueryFilters)
@@ -198,14 +198,14 @@ export default function Repos() {
       minStars: undefined,
       maxStars: undefined,
       pushedTimeRange: undefined,
-      updatedTimeRange: undefined,
-      sort: 'relevance',
+      starredTimeRange: undefined,
+      sort: 'starred',
       order: 'desc'
     })
     setQueryFilters({
       limit: 20,
       offset: 0,
-      sort: 'relevance',
+      sort: 'starred',
       order: 'desc'
     })
     setQuerySearchTerm('')
@@ -379,18 +379,20 @@ export default function Repos() {
               </select>
             </div>
 
-            {/* 元数据更新时间 */}
+            {/* Star时间 */}
             <div className="space-y-2">
-              <label className="text-xs font-medium text-gray-700">元数据更新时间</label>
+              <label className="text-xs font-medium text-gray-700">Star时间</label>
               <select
                 className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200 text-sm"
-                value={uiFilters.updatedTimeRange || ''}
-                onChange={(e) => setUiFilters(prev => ({ ...prev, updatedTimeRange: e.target.value || undefined }))}
+                value={uiFilters.starredTimeRange || ''}
+                onChange={(e) => setUiFilters(prev => ({ ...prev, starredTimeRange: e.target.value || undefined }))}
               >
                 <option value="">全部时间</option>
                 <option value="1w">最近一周</option>
                 <option value="1m">最近一月</option>
                 <option value="3m">最近三月</option>
+                <option value="6m">最近半年</option>
+                <option value="1y">最近一年</option>
               </select>
             </div>
           </div>
@@ -420,19 +422,16 @@ export default function Repos() {
                 <span className="text-xs text-gray-600">排序:</span>
                 <select
                   className="px-3 py-2 text-sm border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
-                  value={uiFilters.sort || 'relevance'}
+                  value={uiFilters.sort || 'starred'}
                   onChange={(e) => {
                     const newSort = e.target.value as any
                     setUiFilters(prev => ({ ...prev, sort: newSort }))
                     setQueryFilters(prev => ({ ...prev, sort: newSort, offset: 0 }))
                   }}
                 >
-                  <option value="relevance">相关度</option>
+                  <option value="starred">Star时间</option>
                   <option value="stars">Star数</option>
-                  <option value="forks">Fork数</option>
                   <option value="pushed">最后活跃</option>
-                  <option value="updated">元数据更新</option>
-                  <option value="created">创建时间</option>
                 </select>
               </div>
 

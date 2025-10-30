@@ -235,11 +235,11 @@ export class StarManager {
       offset = 0,
       pushedAfter,
       pushedBefore,
-      updatedAfter,
-      updatedBefore,
+      starredAfter,
+      starredBefore,
       minStars,
       maxStars,
-      sort = 'relevance',
+      sort = 'starred',
       order = 'desc'
     } = options;
 
@@ -250,8 +250,8 @@ export class StarManager {
       maxStars,
       pushedAfter,
       pushedBefore,
-      updatedAfter,
-      updatedBefore,
+      starredAfter,
+      starredBefore,
       sort,
       order
     });
@@ -336,20 +336,20 @@ export class StarManager {
       }
     }
 
-    if (updatedAfter || updatedBefore) {
-      console.log('🔍 Adding updated time filter:', { updatedAfter, updatedBefore });
-      if (updatedAfter && updatedBefore) {
-        where.updatedAt = {
-          gte: new Date(updatedAfter),
-          lte: new Date(updatedBefore)
+    if (starredAfter || starredBefore) {
+      console.log('🔍 Adding starred time filter:', { starredAfter, starredBefore });
+      if (starredAfter && starredBefore) {
+        where.starredAt = {
+          gte: new Date(starredAfter),
+          lte: new Date(starredBefore)
         };
-      } else if (updatedAfter) {
-        where.updatedAt = {
-          gte: new Date(updatedAfter)
+      } else if (starredAfter) {
+        where.starredAt = {
+          gte: new Date(starredAfter)
         };
-      } else if (updatedBefore) {
-        where.updatedAt = {
-          lte: new Date(updatedBefore)
+      } else if (starredBefore) {
+        where.starredAt = {
+          lte: new Date(starredBefore)
         };
       }
     }
@@ -362,24 +362,11 @@ export class StarManager {
       case 'stars':
         orderBy.stargazersCount = order;
         break;
-      case 'forks':
-        orderBy.forksCount = order;
-        break;
       case 'pushed':
         orderBy.pushedAt = order;
         break;
-      case 'updated':
-        orderBy.updatedAt = order;
-        break;
-      case 'created':
-        orderBy.createdAt = order;
-        break;
-      case 'relevance':
-      default:
-        // 相关度排序：按收藏时间倒序（最近收藏的优先）
-        // 移除了 _relevance 以确保 SQLite 兼容性
-        // _relevance 只在 PostgreSQL/MySQL 中支持，会导致 SQLite 500错误
-        orderBy.stargazersCount = 'desc'; // 按Star数倒序更���合"相关度"的直觉
+      case 'starred':
+        orderBy.starredAt = order;
         break;
     }
 

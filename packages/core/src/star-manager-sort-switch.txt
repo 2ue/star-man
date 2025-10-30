@@ -1,0 +1,13 @@
+  // 排序逻辑
+    let orderBy: any = {};
+    switch (sort) {
+      case 'stars':
+        orderBy.stargazersCount = order;
+        break;
+      case 'pushed':
+        orderBy.pushedAt = order;
+        break;
+      case 'starred':
+        orderBy.starredAt = order;
+        break;
+    }
