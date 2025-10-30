@@ -1,4 +1,4 @@
-import { RefreshCw, Rocket, History, CheckCircle, XCircle, Clock, Play, Pause, AlertCircle } from 'lucide-react'
+import { RefreshCw, Rocket, History, CheckCircle, XCircle, Clock, Play, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { triggerSync, fetchSyncHistory } from '../lib/api'
@@ -221,16 +221,17 @@ export default function SyncPage() {
                 </div>
 
                 <button
-                  className={`btn w-full ${isSyncing
-                    ? 'btn-disabled'
-                    : 'btn-gradient-primary'
-                    }`}
+                  className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center ${
+                    isSyncing
+                      ? 'bg-gray-400 cursor-not-allowed opacity-60'
+                      : 'btn-gradient-primary hover:shadow-lg'
+                  }`}
                   onClick={handleSync}
                   disabled={isSyncing}
                 >
                   {isSyncing ? (
                     <>
-                      <Pause size={14} className="mr-1" />
+                      <RefreshCw size={14} className="mr-1 animate-spin" />
                       同步中...
                     </>
                   ) : (
