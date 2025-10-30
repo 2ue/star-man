@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { Config } from './types';
 import { join, isAbsolute, dirname } from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs-extra';
 
 /**
  * 查找项目根目录（monorepo 的根目录）

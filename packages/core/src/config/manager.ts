@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs-extra';
 import { join } from 'path';
 import { homedir } from 'os';
 import { config as dotenvConfig } from 'dotenv';
