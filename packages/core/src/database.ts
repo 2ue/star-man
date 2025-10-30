@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { DatabaseConfig } from './types';
 import { execSync } from 'child_process';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { ensureDirSync } from 'fs-extra';
 
 export class Database {
   private prisma: PrismaClient;
@@ -20,6 +21,9 @@ export class Database {
 
   async initialize(): Promise<void> {
     try {
+      // ✅ 修复：在连接数据库前，确保 SQLite 文件的父目录存在
+      this.ensureDatabaseDirectoryExists();
+
       await this.prisma.$connect();
 
       // 检查数据库表是否存在
@@ -33,6 +37,26 @@ export class Database {
     } catch (error) {
       throw new Error(`Failed to connect to database: ${error}`);
     }
+  }
+
+  /**
+   * 确保 SQLite 数据库文件的父目录存在
+   * 只处理 file: URL，其他数据库类型跳过
+   */
+  private ensureDatabaseDirectoryExists(): void {
+    const url = this.config.url;
+
+    // 只处理 SQLite (file: URL)
+    if (!url.startsWith('file:')) {
+      return;
+    }
+
+    // 提取文件路径（移除 file: 前缀）
+    const filePath = url.substring(5);
+
+    // 获取父目录并确保存在
+    const dir = dirname(filePath);
+    ensureDirSync(dir);
   }
 
   /**

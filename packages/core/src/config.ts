@@ -82,9 +82,9 @@ if (envPath) {
  * 重要：所有相对路径都基于项目根目录解析，而非 process.cwd()
  */
 function convertToFileUrl(path: string): string {
-  // 如果已经是 file: URL，直接返回
+  // ✅ 修复：如果是 file: URL，提取路径继续处理
   if (path.startsWith('file:')) {
-    return path;
+    path = path.substring(5); // 移除 "file:" 前缀
   }
 
   // 如果是其他协议（mysql, postgresql 等），直接返回
