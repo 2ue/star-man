@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  star-man:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: star-man:latest
+    container_name: star-man
+    restart: unless-stopped
+
+    # 环境变量配置
+    environment:
+      # 运行环境
+      NODE_ENV: production
+
+      # GitHub Token（必需）
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+
+      # 数据库路径（SQLite）
+      DATABASE_URL: file:///app/data/star-man.db
+
+      # API 端口配置
+      API_PORT: 3801
+      API_HOST: 0.0.0.0
+
+    # 端口映射：宿主机端口:容器内端口
+    ports:
+      - "${HOST_PORT:-3801}:3801"
+
+    # 数据持久化
+    volumes:
+      - star-man-data:/app/data
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3801/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# 命名 Volume
+volumes:
+  star-man-data:
+    driver: local

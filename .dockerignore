@@ -1,0 +1,62 @@
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建产物（构建时生成，不需要在构建上下文中）
+dist
+*.tsbuildinfo
+
+# 环境变量文件（不打包进镜像）
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+logs
+*.log
+
+# 运行时数据
+data
+*.db
+*.sqlite
+
+# 开发工具配置
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github
+
+# 历史记录
+.history
+
+# OS 生成文件
+.DS_Store
+Thumbs.db
+
+# 测试覆盖率
+coverage
+
+# 其他 README 和文档
+README.md
+*.md
+!Dockerfile*
+!docker-compose*.yml
+
+# Prisma（构建时会生成，保留 schema 文件）
+node_modules/.prisma
