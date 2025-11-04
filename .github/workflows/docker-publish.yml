@@ -7,7 +7,8 @@ on:
       - 'v*.*.*'
 
 env:
-  IMAGE_NAME: ${{ github.repository }}
+  # 镜像基础名称（仓库名）
+  REPO_NAME: ${{ github.event.repository.name }}
   # 注意: pnpm 版本在 Dockerfile 中指定 (pnpm@7.33.7)
   # 所有构建操作都在 Docker 容器内执行，因此无需在 Actions 环境中设置 pnpm
 
@@ -42,13 +43,14 @@ jobs:
 
       # 提取 Docker 元数据（标签、label等）
       # 同时为两个 registry 生成 tags
+      # Docker Hub 使用 DOCKERHUB_USERNAME，GHCR 使用 GitHub repository
       - name: 提取 Docker 元数据
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            docker.io/${{ env.IMAGE_NAME }}
-            ghcr.io/${{ env.IMAGE_NAME }}
+            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}
+            ghcr.io/${{ github.repository }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -75,8 +77,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 已发布到以下镜像仓库：" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. **Docker Hub:** \`docker.io/${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "2. **GitHub Container Registry:** \`ghcr.io/${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Docker Hub:** \`docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "2. **GitHub Container Registry:** \`ghcr.io/${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 生成的标签：" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
@@ -85,9 +87,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 使用方法：" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "# 从 Docker Hub 拉取" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull docker.io/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "# 从 Docker Hub 拉取（使用你的 Docker Hub 用户名）" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "# 从 GitHub Container Registry 拉取" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ghcr.io/${{ github.repository }}:latest" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
