@@ -18,7 +18,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write  # 需要 write 权限以创建 GitHub Release
       packages: write  # 需要此权限以推送到 GitHub Container Registry
 
     steps:
