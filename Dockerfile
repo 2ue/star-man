@@ -1,68 +1,57 @@
 # ================================
-# Stage 1: 构建阶段 - 构建前端和后端
+# Stage 1: 构建阶段
 # ================================
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 # 安装 pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@7.33.7 --activate
 
-WORKDIR /build
+WORKDIR /app
 
-# 复制依赖文件（必须先复制 package.json 才能利用 Docker 层缓存）
+# 复制所有 package.json 文件
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/core/package.json ./packages/core/
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 
-# 安装所有依赖（包含 devDependencies，用于构建）
+# 安装所有依赖（包括 devDependencies，用于构建和生成 Prisma Client）
 RUN pnpm install --frozen-lockfile
 
-# 复制源代码
+# 复制所有源代码
 COPY packages/ ./packages/
 COPY tsconfig.json ./
 
-# 生成 Prisma Client
+# 生成 Prisma Client（生成到 node_modules/.pnpm 中）
 RUN cd packages/core && pnpm db:generate
 
-# 构建所有包
-RUN pnpm build
+# 构建所有需要的包
+RUN pnpm --filter @star-man/core build
+RUN pnpm --filter @star-man/web build
+RUN pnpm --filter @star-man/api build
 
 # ================================
-# Stage 2: 生产镜像 - 只包含运行时
+# Stage 2: 生产运行镜像
 # ================================
-FROM node:20-alpine
+FROM node:20
 
 # 安装 pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@7.33.7 --activate
 
-# 创建应用目录
 WORKDIR /app
 
-# 复制依赖文件
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages/core/package.json ./packages/core/
-COPY packages/api/package.json ./packages/api/
+# 从构建阶段复制整个应用（包括完整的 node_modules）
+# 这样可以保留 pnpm 的符号链接结构和生成的 Prisma Client
+COPY --from=builder /app ./
 
-# 只安装生产依赖
-RUN pnpm install --prod --frozen-lockfile
+# 移除不需要的开发文件（可选，减小镜像大小）
+RUN rm -rf packages/*/src packages/*/test packages/*/tests
 
-# 复制构建产物
-COPY --from=builder /build/packages/core/dist ./packages/core/dist
-COPY --from=builder /build/packages/core/prisma ./packages/core/prisma
-COPY --from=builder /build/packages/api/dist ./packages/api/dist
-COPY --from=builder /build/packages/web/dist ./packages/web/dist
+# 创建数据目录和非 root 用户
+RUN mkdir -p /app/data && \
+    groupadd -r -g 1001 nodejs && \
+    useradd -r -u 1001 -g nodejs starman && \
+    chown -R starman:nodejs /app
 
-# 复制 Prisma Client（生成的代码，在 node_modules 中）
-COPY --from=builder /build/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /build/node_modules/@prisma ./node_modules/@prisma
-
-# 创建数据目录
-RUN mkdir -p /app/data
-
-# 创建非 root 用户（安全最佳实践）
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S starman -u 1001
-RUN chown -R starman:nodejs /app
 USER starman
 
 # 设置环境变量
@@ -73,7 +62,7 @@ EXPOSE 3801
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3801/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
+  CMD node -e "require('http').get('http://localhost:3801/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
 
-# 启动命令
+# 启动 API 服务（同时服务静态前端文件）
 CMD ["node", "packages/api/dist/server.js"]
