@@ -8,7 +8,7 @@ export function createInitCommand(): Command {
     .option('-f, --force', '强制覆盖现有配置')
     .option('-t, --token <token>', 'GitHub Token')
     .option('--api-port <port>', 'API 端口', '3801')
-    .option('--web-port <port>', 'Web 端口', '5173')
+    .option('--web-port <port>', 'Web 端口', '3800')
     .action(async (options) => {
       console.log(chalk.blue('🚀 Star-Man 初始化向导\n'));
 
@@ -31,7 +31,7 @@ export function createInitCommand(): Command {
           type: 'input',
           name: 'webPort',
           message: 'Web 服务端口:',
-          default: '5173', 
+          default: '3800',
           when: () => !options.webPort
         }
       ]);

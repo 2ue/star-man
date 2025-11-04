@@ -1,6 +1,6 @@
 {
   "name": "star-man",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "GitHub star management tool",
   "private": true,
   "scripts": {

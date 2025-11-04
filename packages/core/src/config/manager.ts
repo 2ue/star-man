@@ -88,7 +88,7 @@ export class ConfigManager {
     mkdirSync(join(this.configDir, 'logs'), { recursive: true });
 
     const apiPort = options.apiPort || 3801;
-    const webPort = options.webPort || 5173;
+    const webPort = options.webPort || 3800;
 
     // 创建配置
     const config: StarManConfig = {

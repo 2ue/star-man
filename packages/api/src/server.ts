@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
-import path from 'path';
 import { StarManager, loadConfig, validateConfig, displayConfig, checkWorkingDirectory } from '@star-man/core';
 import { createReposRouter } from './routes/repos';
 import { createSyncRouter } from './routes/sync';
@@ -15,9 +14,6 @@ if (!process.env.CI) {
   checkWorkingDirectory();
 }
 
-// 静态文件目录
-const STATIC_DIR = path.join(process.cwd(), 'packages/web/dist');
-
 const app = express();
 
 // 中间件
@@ -26,9 +22,6 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// 静态文件服务（前端）
-app.use(express.static(STATIC_DIR));
 
 // Swagger 文档
 function createSwaggerDocument(host: string, port: number) {
@@ -164,11 +157,6 @@ async function startServer() {
         timestamp: new Date().toISOString(),
         version: '1.0.0',
       });
-    });
-
-    // SPA fallback - 所有非 API 路由返回 index.html
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(STATIC_DIR, 'index.html'));
     });
 
     // 错误处理

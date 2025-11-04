@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   star-man:
-    image: gcr.io/2ue/star-man:latest
-    container_name: star-man
+    image: star-man:latest
+    container_name: star-man-local
     restart: unless-stopped
 
     environment:
