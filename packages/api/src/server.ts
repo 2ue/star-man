@@ -131,10 +131,6 @@ async function startServer() {
     displayConfig(config);
 
     const PORT = config.api.port;
-    // 开发环境强制 0.0.0.0 避免 IPv4/IPv6 冲突，生产环境允许配置
-    const HOST: string = process.env.NODE_ENV === 'production'
-      ? (config.api.host || '0.0.0.0')
-      : '0.0.0.0';
 
     // 初始化 StarManager
     const starManager = new StarManager(config);
@@ -147,7 +143,7 @@ async function startServer() {
     app.use('/api/stats', statsRouter);
 
     // Swagger 文档
-    const swaggerDocument = createSwaggerDocument(HOST || 'localhost', PORT);
+    const swaggerDocument = createSwaggerDocument('localhost', PORT);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     // 健康检查
@@ -169,16 +165,13 @@ async function startServer() {
       });
     });
 
-    // 启动服务器
-    app.listen(PORT, HOST, () => {
-      const displayHost = HOST === '0.0.0.0' ? 'localhost' : HOST;
+    // 启动服务器 - 不指定 host，让 Node.js 自动监听所有接口（IPv4 + IPv6）
+    app.listen(PORT, () => {
       console.log(`🚀 Star-Man API 服务器启动成功`);
-      console.log(`📍 服务地址: http://${displayHost}:${PORT}`);
-      console.log(`📚 API 文档: http://${displayHost}:${PORT}/api-docs`);
-      console.log(`💚 健康检查: http://${displayHost}:${PORT}/health`);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`🔧 开发模式: 监听所有接口 (${HOST})`);
-      }
+      console.log(`📍 服务地址: http://localhost:${PORT}`);
+      console.log(`📚 API 文档: http://localhost:${PORT}/api-docs`);
+      console.log(`💚 健康检查: http://localhost:${PORT}/health`);
+      console.log(`🌐 监听: 所有接口 (IPv4 + IPv6)`);
     });
 
     // 优雅关闭
