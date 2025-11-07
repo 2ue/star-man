@@ -42,6 +42,14 @@ model StarredRepo {
   category         String?
   syncAt           DateTime @map("sync_at")
 
+  // AI 增强字段
+  embedding        String?   // 向量嵌入（JSON 格式存储）
+  aiSummary        String?   @map("ai_summary") // AI 生成的摘要
+  aiTags           String?   @map("ai_tags") // AI 生成的标签（JSON）
+  aiCategory       String?   @map("ai_category") // AI 生成的分类
+  similarityScore  Float?    @map("similarity_score") // 相似度评分
+  lastEmbedAt      DateTime? @map("last_embed_at") // 最后嵌入时间
+
   @@map("starred_repos")
   @@index([ownerLogin])
   @@index([language])
@@ -49,6 +57,8 @@ model StarredRepo {
   @@index([category])
   @@index([syncAt])
   @@index([starredAt])
+  @@index([lastEmbedAt])
+  @@index([aiCategory])
 }
 
 model SyncHistory {
@@ -62,4 +72,46 @@ model SyncHistory {
   success       Boolean  @default(true)
 
   @@map("sync_history")
+}
+
+// 用户交互记录（用于推荐系统）
+model UserInteraction {
+  id          Int      @id @default(autoincrement())
+  repoId      Int      @map("repo_id")
+  action      String   // view, star, search, click
+  context     String?  // 搜索词、来源页面等上下文信息
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("user_interactions")
+  @@index([repoId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// AI 对话历史
+model ChatHistory {
+  id          Int      @id @default(autoincrement())
+  role        String   // user, assistant, system
+  content     String
+  metadata    String?  // JSON（模型、token 数等）
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("chat_history")
+  @@index([createdAt])
+}
+
+// AI 嵌入任务队列
+model EmbeddingTask {
+  id          Int      @id @default(autoincrement())
+  status      String   @default("pending") // pending, processing, completed, failed
+  repoIds     String?  // JSON array of repo IDs to process
+  progress    Int      @default(0) // 进度百分比
+  total       Int      @default(0) // 总数
+  error       String?  // 错误信息
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("embedding_tasks")
+  @@index([status])
+  @@index([createdAt])
 }

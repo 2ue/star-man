@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { Config } from './types';
+import { Config, AIConfig } from './types';
 import { join, isAbsolute, dirname } from 'path';
 import { existsSync, readFileSync } from 'fs-extra';
 
@@ -130,6 +130,67 @@ function getEnvWithTransform<T>(key: string, transformer: (value: string) => T):
   }
 }
 
+/**
+ * 加载 AI 配置
+ */
+function loadAIConfig(): AIConfig {
+  const enabled = process.env.AI_ENABLED === 'true';
+  const model = (process.env.AI_MODEL || 'ollama') as 'ollama' | 'openai' | 'gemini' | 'qwen';
+
+  const aiConfig: AIConfig = {
+    enabled,
+    model,
+  };
+
+  // Ollama 配置
+  if (process.env.OLLAMA_BASE_URL) {
+    aiConfig.ollama = {
+      baseUrl: process.env.OLLAMA_BASE_URL,
+      model: process.env.OLLAMA_MODEL || 'llama3.2',
+    };
+  }
+
+  // OpenAI 配置
+  if (process.env.OPENAI_API_KEY) {
+    aiConfig.openai = {
+      apiKey: process.env.OPENAI_API_KEY,
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    };
+  }
+
+  // Gemini 配置
+  if (process.env.GEMINI_API_KEY) {
+    aiConfig.gemini = {
+      apiKey: process.env.GEMINI_API_KEY,
+      model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+    };
+  }
+
+  // Qwen 配置
+  if (process.env.QWEN_API_KEY) {
+    aiConfig.qwen = {
+      apiKey: process.env.QWEN_API_KEY,
+      model: process.env.QWEN_MODEL || 'qwen-turbo',
+    };
+  }
+
+  // Qdrant 配置
+  if (process.env.QDRANT_URL) {
+    aiConfig.qdrant = {
+      url: process.env.QDRANT_URL,
+      collection: process.env.QDRANT_COLLECTION || 'starred_repos',
+    };
+  }
+
+  // 嵌入模型配置
+  aiConfig.embedding = {
+    model: (process.env.EMBEDDING_MODEL || 'ollama') as 'ollama' | 'openai' | 'local',
+    dimension: parseInt(process.env.EMBEDDING_DIMENSION || '768', 10),
+  };
+
+  return aiConfig;
+}
+
 export function loadConfig(): Config {
   try {
     // 必需配置
@@ -174,6 +235,9 @@ export function loadConfig(): Config {
         host: apiHost, // 可以为 undefined
       };
     }
+
+    // AI 配置（可选）
+    config.ai = loadAIConfig();
 
     return config;
   } catch (error) {

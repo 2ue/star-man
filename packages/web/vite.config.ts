@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   // 加载环境变量
   const env = loadEnv(mode, process.cwd(), '')
-
+  console.log('env:', env.VITE_API_PROXY_TARGET)
   return {
     plugins: [react()],
     server: {
