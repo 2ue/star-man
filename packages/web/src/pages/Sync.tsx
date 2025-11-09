@@ -5,6 +5,7 @@ import { triggerSync, fetchSyncHistory } from '../lib/api'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import Pagination from '../components/Pagination'
+import { AutoSyncConfig } from '../components/AutoSyncConfig'
 
 // 设置dayjs中文语言包
 dayjs.locale('zh-cn')
@@ -78,8 +79,8 @@ export default function SyncPage() {
   }
 
   const getTypeText = (record: any) => {
-    // 根据记录信息推断同步类型，这里简单判断
-    // 如果新增数量较多，可能是全量同步
+    // 根据记录信息推断同步类型,这里简单判断
+    // 如果新增数量较多,可能是全量同步
     return record.added > 5 ? '全量' : '增量'
   }
 
@@ -101,153 +102,165 @@ export default function SyncPage() {
         </p>
       </div>
 
-      {/* 同步操作控制 */}
-      <div className="card-modern">
-        <div className="card-compact">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <RefreshCw size={20} className="text-white" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-800">GitHub Stars 同步</h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 同步类型选择 */}
-            <div className="space-y-3">
-              <h3 className="text-base font-medium text-gray-700 mb-3">选择同步类型</h3>
-
-              <div className="space-y-3">
-                <label
-                  className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${syncType === 'incremental'
-                    ? 'border-2 border-blue-500 bg-blue-50 shadow-lg shadow-blue-500/20'
-                    : 'border-2 border-gray-200 bg-white hover:border-blue-300 hover:bg-purple-50/30'
-                    }`}
-                  onClick={() => setSyncType('incremental')}
-                >
-                  <div className="flex items-center justify-center">
-                    <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${syncType === 'incremental'
-                      ? 'border-blue-500 bg-blue-500'
-                      : 'border-gray-300'
-                      }`}>
-                      {syncType === 'incremental' && (
-                        <div className="w-full h-full rounded-full bg-white scale-75"></div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${syncType === 'incremental'
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg'
-                      : 'bg-gradient-to-br from-blue-400 to-blue-600'
-                      }`}>
-                      <RefreshCw size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <div className={`font-semibold text-base transition-colors duration-300 ${syncType === 'incremental' ? 'text-blue-800' : 'text-gray-800'
-                        }`}>
-                        增量同步
-                      </div>
-                      <div className={`text-sm transition-colors duration-300 ${syncType === 'incremental' ? 'text-blue-600' : 'text-gray-600'
-                        }`}>
-                        只同步新增和变更的仓库
-                      </div>
-                    </div>
-                  </div>
-                </label>
-
-                <label
-                  className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${syncType === 'full'
-                    ? 'border-2 border-purple-500 bg-purple-50 shadow-lg shadow-purple-500/20'
-                    : 'border-2 border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/30'
-                    }`}
-                  onClick={() => setSyncType('full')}
-                >
-                  <div className="flex items-center justify-center">
-                    <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${syncType === 'full'
-                      ? 'border-purple-500 bg-purple-500'
-                      : 'border-gray-300'
-                      }`}>
-                      {syncType === 'full' && (
-                        <div className="w-full h-full rounded-full bg-white scale-75"></div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${syncType === 'full'
-                      ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg'
-                      : 'bg-gradient-to-br from-purple-400 to-purple-600'
-                      }`}>
-                      <Rocket size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <div className={`font-semibold text-base transition-colors duration-300 ${syncType === 'full' ? 'text-purple-800' : 'text-gray-800'
-                        }`}>
-                        全量同步
-                      </div>
-                      <div className={`text-sm transition-colors duration-300 ${syncType === 'full' ? 'text-purple-600' : 'text-gray-600'
-                        }`}>
-                        重新同步所有仓库数据
-                      </div>
-                    </div>
-                  </div>
-                </label>
+      {/* 第一行: 同步类型选择 + 同步控制 + 自动同步 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* 同步类型选择 */}
+        <div className="card-modern">
+          <div className="card-compact">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <RefreshCw size={20} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">同步类型</h2>
+                <p className="text-xs text-gray-500">选择同步模式</p>
               </div>
             </div>
 
-            {/* 同步状态和控制 */}
-            <div className="space-y-3">
-              <h3 className="text-base font-medium text-gray-700 mb-3">同步控制</h3>
-
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="mb-3">
-                  {isSyncing ? (
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <RefreshCw size={20} className="text-blue-600 animate-spin" />
-                    </div>
-                  ) : (
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <CheckCircle size={20} className="text-green-600" />
-                    </div>
-                  )}
-
-                  <h4 className="text-base font-medium text-gray-800 mb-1">
-                    {isSyncing ? '正在同步中...' : '准备就绪'}
-                  </h4>
-                  <p className="text-xs text-gray-600">
-                    {isSyncing
-                      ? `正在执行${syncType === 'incremental' ? '增量' : '全量'}同步`
-                      : '点击按钮开始同步'
-                    }
-                  </p>
-                </div>
-
-                <button
-                  className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center ${
-                    isSyncing
-                      ? 'bg-gray-400 cursor-not-allowed opacity-60'
-                      : 'btn-gradient-primary hover:shadow-lg'
+            <div className="space-y-2">
+              <label
+                className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${syncType === 'incremental'
+                  ? 'border-2 border-blue-500 bg-blue-50 shadow-lg shadow-blue-500/20'
+                  : 'border-2 border-gray-200 bg-white hover:border-blue-300 hover:bg-purple-50/30'
                   }`}
-                  onClick={handleSync}
-                  disabled={isSyncing}
-                >
-                  {isSyncing ? (
-                    <>
-                      <RefreshCw size={14} className="mr-1 animate-spin" />
-                      同步中...
-                    </>
-                  ) : (
-                    <>
-                      <Play size={14} className="mr-1" />
-                      开始同步
-                    </>
-                  )}
-                </button>
-              </div>
+                onClick={() => setSyncType('incremental')}
+              >
+                <div className="flex items-center justify-center">
+                  <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${syncType === 'incremental'
+                    ? 'border-blue-500 bg-blue-500'
+                    : 'border-gray-300'
+                    }`}>
+                    {syncType === 'incremental' && (
+                      <div className="w-full h-full rounded-full bg-white scale-75"></div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${syncType === 'incremental'
+                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg'
+                    : 'bg-gradient-to-br from-blue-400 to-blue-600'
+                    }`}>
+                    <RefreshCw size={20} className="text-white" />
+                  </div>
+                  <div>
+                    <div className={`font-semibold text-base transition-colors duration-300 ${syncType === 'incremental' ? 'text-blue-800' : 'text-gray-800'
+                      }`}>
+                      增量同步
+                    </div>
+                    <div className={`text-sm transition-colors duration-300 ${syncType === 'incremental' ? 'text-blue-600' : 'text-gray-600'
+                      }`}>
+                      只同步新增和变更的仓库
+                    </div>
+                  </div>
+                </div>
+              </label>
+
+              <label
+                className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 ${syncType === 'full'
+                  ? 'border-2 border-purple-500 bg-purple-50 shadow-lg shadow-purple-500/20'
+                  : 'border-2 border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50/30'
+                  }`}
+                onClick={() => setSyncType('full')}
+              >
+                <div className="flex items-center justify-center">
+                  <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${syncType === 'full'
+                    ? 'border-purple-500 bg-purple-500'
+                    : 'border-gray-300'
+                    }`}>
+                    {syncType === 'full' && (
+                      <div className="w-full h-full rounded-full bg-white scale-75"></div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${syncType === 'full'
+                    ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg'
+                    : 'bg-gradient-to-br from-purple-400 to-purple-600'
+                    }`}>
+                    <Rocket size={20} className="text-white" />
+                  </div>
+                  <div>
+                    <div className={`font-semibold text-base transition-colors duration-300 ${syncType === 'full' ? 'text-purple-800' : 'text-gray-800'
+                      }`}>
+                      全量同步
+                    </div>
+                    <div className={`text-sm transition-colors duration-300 ${syncType === 'full' ? 'text-purple-600' : 'text-gray-600'
+                      }`}>
+                      重新同步所有仓库数据
+                    </div>
+                  </div>
+                </div>
+              </label>
             </div>
           </div>
         </div>
+
+        {/* 同步控制 */}
+        <div className="card-modern">
+          <div className="card-compact">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Play size={20} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">执行同步</h2>
+                <p className="text-xs text-gray-500">立即开始同步</p>
+              </div>
+            </div>
+
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
+              <div className="mb-3">
+                {isSyncing ? (
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <RefreshCw size={20} className="text-blue-600 animate-spin" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <CheckCircle size={20} className="text-green-600" />
+                  </div>
+                )}
+
+                <h4 className="text-base font-medium text-gray-800 mb-1">
+                  {isSyncing ? '正在同步中...' : '准备就绪'}
+                </h4>
+                <p className="text-xs text-gray-600">
+                  {isSyncing
+                    ? `正在执行${syncType === 'incremental' ? '增量' : '全量'}同步`
+                    : '点击按钮开始同步'
+                  }
+                </p>
+              </div>
+
+              <button
+                className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center ${
+                  isSyncing
+                    ? 'bg-gray-400 cursor-not-allowed opacity-60'
+                    : 'btn-gradient-primary hover:shadow-lg'
+                }`}
+                onClick={handleSync}
+                disabled={isSyncing}
+              >
+                {isSyncing ? (
+                  <>
+                    <RefreshCw size={14} className="mr-1 animate-spin" />
+                    同步中...
+                  </>
+                ) : (
+                  <>
+                    <Play size={14} className="mr-1" />
+                    开始同步
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 自动同步配置 */}
+        <AutoSyncConfig />
       </div>
 
-      {/* 同步历史记录 */}
+      {/* 第二行: 同步历史记录 */}
       <div className="card-modern">
         <div className="card-compact">
           <div className="flex items-center justify-between mb-4">
@@ -346,7 +359,7 @@ export default function SyncPage() {
                       <History size={20} className="text-gray-400" />
                     </div>
                     <h3 className="text-base font-medium text-gray-600 mb-1">暂无同步记录</h3>
-                    <p className="text-xs text-gray-500">开始第一次同步后，这里会显示历史记录</p>
+                    <p className="text-xs text-gray-500">开始第一次同步后,这里会显示历史记录</p>
                   </div>
                 )}
               </div>

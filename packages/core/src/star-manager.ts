@@ -1,21 +1,27 @@
 import { Database } from './database';
 import { GitHubService } from './github';
 import { RepoAnalyzer } from './analyzer';
+import { ConfigService } from './config-service';
+import { SyncScheduler, SyncExecutor } from './sync-scheduler';
 import { Config, SyncResult, GetReposOptions, GetReposResult, StatsResult, CategoryStats, LanguageStats } from './types';
 
-export class StarManager {
+export class StarManager implements SyncExecutor {
   private db: Database;
   private github: GitHubService;
   private analyzer: RepoAnalyzer;
+  private configService: ConfigService;
+  private scheduler?: SyncScheduler;
 
   constructor(config: Config) {
     this.db = new Database(config.database);
     this.github = new GitHubService(config.github.token);
     this.analyzer = new RepoAnalyzer();
+    this.configService = new ConfigService(this.db);
   }
 
   async initialize(): Promise<void> {
     await this.db.initialize();
+    await this.configService.initConfig();
   }
 
   async syncStarredRepos(_incremental: boolean = true, onProgress?: (progress: { current: number; total: number; repo: string; action: string }) => void): Promise<SyncResult> {
@@ -558,7 +564,46 @@ export class StarManager {
     });
   }
 
+  /**
+   * 启动定时同步（仅在 API 服务中调用）
+   */
+  async startScheduler(): Promise<void> {
+    if (!this.scheduler) {
+      this.scheduler = new SyncScheduler(this, this.configService);
+    }
+    await this.scheduler.start();
+  }
+
+  /**
+   * 停止定时同步
+   */
+  stopScheduler(): void {
+    this.scheduler?.stop();
+  }
+
+  /**
+   * 重启定时同步（配置更新后调用）
+   */
+  async restartScheduler(): Promise<void> {
+    await this.scheduler?.restart();
+  }
+
+  /**
+   * 获取配置服务（供 API 使用）
+   */
+  getConfigService(): ConfigService {
+    return this.configService;
+  }
+
+  /**
+   * 获取调度器状态
+   */
+  getSchedulerStatus() {
+    return this.scheduler?.getStatus() ?? { isRunning: false, isSyncing: false };
+  }
+
   async close(): Promise<void> {
+    this.stopScheduler();
     await this.db.close();
   }
 }

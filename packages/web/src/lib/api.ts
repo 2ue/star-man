@@ -99,3 +99,19 @@ export const fetchCategoriesStats = async (): Promise<import('../types/api').Cat
   const response = await http.get<import('../types/api').CategoryStat[]>('/api/stats/categories')
   return response.data
 }
+
+// 获取自动同步配置
+export const getAutoSyncConfig = async () => {
+  const response = await http.get('/api/config/auto-sync')
+  return response.data
+}
+
+// 更新自动同步配置
+export const updateAutoSyncConfig = async (data: {
+  enabled?: boolean
+  cronExpr?: string
+  timezone?: string
+}) => {
+  const response = await http.put('/api/config/auto-sync', data)
+  return response.data
+}

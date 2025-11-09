@@ -28,11 +28,13 @@
     "cli-table": "^0.3.11",
     "commander": "^11.0.0",
     "inquirer": "^9.2.10",
+    "node-cron": "^4.2.1",
     "ora": "^7.0.1"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.9",
     "@types/node": "^20.6.0",
+    "@types/node-cron": "^3.0.11",
     "typescript": "^5.2.2"
   }
 }

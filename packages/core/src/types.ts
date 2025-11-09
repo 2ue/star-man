@@ -113,3 +113,14 @@ export interface LanguageStats {
   language: string;
   count: number;
 }
+
+export interface AutoSyncConfig {
+  enabled: boolean;
+  cronExpr: string;
+  timezone: string;
+}
+
+export interface SchedulerStatus {
+  isRunning: boolean;
+  isSyncing: boolean;
+}

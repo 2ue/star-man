@@ -63,3 +63,13 @@ model SyncHistory {
 
   @@map("sync_history")
 }
+
+model AppConfig {
+  key       String   @id
+  value     String
+  type      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_config")
+}
