@@ -213,7 +213,7 @@ Topics: ${topics.length > 0 ? topics.join(', ') : '无'}
   /**
    * 对话式查询（流式响应）
    */
-  async *chatStream(message: string, context: ChatContext): Promise<AsyncGenerator<string>> {
+  async *chatStream(message: string, context: ChatContext): AsyncGenerator<string> {
     const systemPrompt = `你是 Star Manager 的 AI 助手。你可以帮助用户：
 1. 查询和搜索 GitHub Star 仓库
 2. 推荐相关仓库
