@@ -124,3 +124,14 @@ jobs:
           echo "# 从 GitHub Container Registry 拉取" >> $GITHUB_STEP_SUMMARY
           echo "docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+      # 发布失败时清理：删除已创建的 tag
+      - name: 清理失败的发布 - 删除 tag
+        if: failure()
+        run: |
+          echo "## ❌ 发布失败，正在清理..." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "删除 tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          git push --delete origin ${{ github.ref_name }} || echo "远端 tag 删除失败或已不存在"
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Tag ${{ github.ref_name }} 已被删除，请修复问题后重新创建 tag 进行发布**" >> $GITHUB_STEP_SUMMARY
