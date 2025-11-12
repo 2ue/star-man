@@ -1,6 +1,9 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
+import { getProjectRoot } from '@star-man/core';
 
 export function createInitCommand(): Command {
   return new Command('init')
@@ -12,6 +15,15 @@ export function createInitCommand(): Command {
     .action(async (options) => {
       console.log(chalk.blue('🚀 Star-Man 初始化向导\n'));
 
+      const projectRoot = getProjectRoot();
+      const envPath = path.join(projectRoot, '.env');
+
+      // 检查 .env 是否已存在
+      if (fs.existsSync(envPath) && !options.force) {
+        console.log(chalk.yellow('⚠️  配置文件已存在。使用 --force 选项来覆盖。'));
+        return;
+      }
+
       const answers = await inquirer.prompt([
         {
           type: 'password',
@@ -22,7 +34,7 @@ export function createInitCommand(): Command {
         },
         {
           type: 'input',
-          name: 'apiPort',  
+          name: 'apiPort',
           message: 'API 服务端口:',
           default: '3801',
           when: () => !options.apiPort
@@ -37,20 +49,25 @@ export function createInitCommand(): Command {
       ]);
 
       try {
-        // 动态导入配置管理器
-        const { ConfigManager } = await import('@star-man/core');
-        
-        await ConfigManager.getInstance().init({
-          githubToken: options.token || answers.githubToken,
-          apiPort: parseInt(options.apiPort || answers.apiPort),
-          webPort: parseInt(options.webPort || answers.webPort),
-          force: options.force
-        });
+        const githubToken = options.token || answers.githubToken;
+        const apiPort = options.apiPort || answers.apiPort;
+        const webPort = options.webPort || answers.webPort;
 
-        console.log(chalk.green('✅ 配置初始化完成！'));
+        // 写入 .env 文件
+        const envContent = `# Star-Man Configuration
+GITHUB_TOKEN=${githubToken}
+API_PORT=${apiPort}
+WEB_PORT=${webPort}
+DATABASE_URL=file:./data/starman.db
+`;
+
+        fs.writeFileSync(envPath, envContent, 'utf-8');
+
+        console.log(chalk.green('\n✅ 配置初始化完成！'));
+        console.log(chalk.gray(`   配置文件: ${envPath}`));
         console.log(chalk.blue('\n下一步:'));
         console.log(`  ${chalk.yellow('starman sync')}     同步仓库`);
-        console.log(`  ${chalk.yellow('starman list')}     查看仓库列表`); 
+        console.log(`  ${chalk.yellow('starman list')}     查看仓库列表`);
         console.log(`  ${chalk.yellow('starman stats')}    查看统计信息`);
 
       } catch (error) {

@@ -7,7 +7,7 @@ import { StarManager, loadConfig, validateConfig, displayConfig, checkWorkingDir
 import { createReposRouter } from './routes/repos';
 import { createSyncRouter } from './routes/sync';
 import { createUnstarRoutes } from './routes/unstar';
-import statsRouter from './routes/stats';
+import { createStatsRouter } from './routes/stats';
 
 // 检查工作目录（仅在非 CI 环境）
 if (!process.env.CI) {
@@ -140,7 +140,7 @@ async function startServer() {
     app.use('/api/repos', createReposRouter(starManager));
     app.use('/api/sync', createSyncRouter(starManager));
     app.use('/api/unstar', createUnstarRoutes(starManager));
-    app.use('/api/stats', statsRouter);
+    app.use('/api/stats', createStatsRouter(starManager));
 
     // Swagger 文档
     const swaggerDocument = createSwaggerDocument('localhost', PORT);
