@@ -11,44 +11,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model StarredRepo {
-  id               Int      @id
-  nodeId           String   @map("node_id")
-  name             String
-  fullName         String   @unique @map("full_name")
-  ownerLogin       String   @map("owner_login")
-  ownerId          Int      @map("owner_id")
-  ownerAvatarUrl   String?  @map("owner_avatar_url")
-  description      String?
-  htmlUrl          String   @map("html_url")
-  cloneUrl         String   @map("clone_url")
-  sshUrl           String   @map("ssh_url")
-  language         String?
-  stargazersCount  Int      @default(0) @map("stargazers_count")
-  forksCount       Int      @default(0) @map("forks_count")
-  size             Int      @default(0)
-  defaultBranch    String   @default("main") @map("default_branch")
-  topics           String?  // JSON string
-  createdAt        DateTime @map("created_at")
-  updatedAt        DateTime @map("updated_at")
-  pushedAt         DateTime? @map("pushed_at")
-  starredAt        DateTime @map("starred_at")
-  archived         Boolean  @default(false)
-  disabled         Boolean  @default(false)
-  private          Boolean  @default(false)
-  fork             Boolean  @default(false)
-  isStarred        Boolean  @default(true) @map("is_starred")
-  tags             String?  // JSON string
-  category         String?
-  syncAt           DateTime @map("sync_at")
+// ============ 核心表 ============
 
-  // AI 增强字段
-  embedding        String?   // 向量嵌入（JSON 格式存储）
-  aiSummary        String?   @map("ai_summary") // AI 生成的摘要
-  aiTags           String?   @map("ai_tags") // AI 生成的标签（JSON）
-  aiCategory       String?   @map("ai_category") // AI 生成的分类
-  similarityScore  Float?    @map("similarity_score") // 相似度评分
-  lastEmbedAt      DateTime? @map("last_embed_at") // 最后嵌入时间
+model StarredRepo {
+  id              Int       @id
+  nodeId          String    @map("node_id")
+  name            String
+  fullName        String    @unique @map("full_name")
+  ownerLogin      String    @map("owner_login")
+  ownerId         Int       @map("owner_id")
+  ownerAvatarUrl  String?   @map("owner_avatar_url")
+  description     String?
+  htmlUrl         String    @map("html_url")
+  cloneUrl        String    @map("clone_url")
+  sshUrl          String    @map("ssh_url")
+  language        String?
+  stargazersCount Int       @default(0) @map("stargazers_count")
+  forksCount      Int       @default(0) @map("forks_count")
+  size            Int       @default(0)
+  defaultBranch   String    @default("main") @map("default_branch")
+  createdAt       DateTime  @map("created_at")
+  updatedAt       DateTime  @map("updated_at")
+  pushedAt        DateTime? @map("pushed_at")
+  starredAt       DateTime  @map("starred_at")
+  archived        Boolean   @default(false)
+  disabled        Boolean   @default(false)
+  private         Boolean   @default(false)
+  fork            Boolean   @default(false)
+  isStarred       Boolean   @default(true) @map("is_starred")
+  category        String?
+  syncAt          DateTime  @map("sync_at")
+
+  // 关系
+  tags   RepoTag[]
+  topics RepoTopic[]
 
   @@map("starred_repos")
   @@index([ownerLogin])
@@ -57,61 +53,65 @@ model StarredRepo {
   @@index([category])
   @@index([syncAt])
   @@index([starredAt])
-  @@index([lastEmbedAt])
-  @@index([aiCategory])
 }
+
+// ============ 标签系统 ============
+
+model Tag {
+  id    Int       @id @default(autoincrement())
+  name  String    @unique
+  repos RepoTag[]
+
+  @@map("tags")
+  @@index([name])
+}
+
+model RepoTag {
+  repoId Int
+  tagId  Int
+  repo   StarredRepo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  tag    Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([repoId, tagId])
+  @@map("repo_tags")
+  @@index([tagId])
+  @@index([repoId])
+}
+
+// ============ Topics 系统 ============
+
+model Topic {
+  id    Int         @id @default(autoincrement())
+  name  String      @unique
+  repos RepoTopic[]
+
+  @@map("topics")
+  @@index([name])
+}
+
+model RepoTopic {
+  repoId  Int
+  topicId Int
+  repo    StarredRepo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  topic   Topic       @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([repoId, topicId])
+  @@map("repo_topics")
+  @@index([topicId])
+  @@index([repoId])
+}
+
+// ============ 同步历史 ============
 
 model SyncHistory {
-  id            Int      @id @default(autoincrement())
-  syncAt        DateTime @map("sync_at")
-  added         Int      @default(0)
-  updated       Int      @default(0)
-  unstarred     Int      @default(0)
-  total         Int      @default(0)
-  errorMessage  String?  @map("error_message")
-  success       Boolean  @default(true)
+  id           Int      @id @default(autoincrement())
+  syncAt       DateTime @map("sync_at")
+  added        Int      @default(0)
+  updated      Int      @default(0)
+  unstarred    Int      @default(0)
+  total        Int      @default(0)
+  errorMessage String?  @map("error_message")
+  success      Boolean  @default(true)
 
   @@map("sync_history")
-}
-
-// 用户交互记录（用于推荐系统）
-model UserInteraction {
-  id          Int      @id @default(autoincrement())
-  repoId      Int      @map("repo_id")
-  action      String   // view, star, search, click
-  context     String?  // 搜索词、来源页面等上下文信息
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  @@map("user_interactions")
-  @@index([repoId])
-  @@index([action])
-  @@index([createdAt])
-}
-
-// AI 对话历史
-model ChatHistory {
-  id          Int      @id @default(autoincrement())
-  role        String   // user, assistant, system
-  content     String
-  metadata    String?  // JSON（模型、token 数等）
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  @@map("chat_history")
-  @@index([createdAt])
-}
-
-// AI 嵌入任务队列
-model EmbeddingTask {
-  id          Int      @id @default(autoincrement())
-  status      String   @default("pending") // pending, processing, completed, failed
-  repoIds     String?  // JSON array of repo IDs to process
-  progress    Int      @default(0) // 进度百分比
-  total       Int      @default(0) // 总数
-  error       String?  // 错误信息
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("embedding_tasks")
-  @@index([status])
-  @@index([createdAt])
 }

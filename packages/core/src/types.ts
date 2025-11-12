@@ -4,7 +4,6 @@ export interface Config {
   };
   database: DatabaseConfig;
   api?: ApiConfig;
-  ai?: AIConfig;
 }
 
 export interface ApiConfig {
@@ -113,87 +112,4 @@ export interface CategoryStats {
 export interface LanguageStats {
   language: string;
   count: number;
-}
-
-// ============ AI 相关类型定义 ============
-
-export interface AIConfig {
-  enabled: boolean;
-  model: 'ollama' | 'openai' | 'gemini' | 'qwen';
-  ollama?: {
-    baseUrl: string;
-    model: string;
-  };
-  openai?: {
-    apiKey: string;
-    model: string;
-  };
-  gemini?: {
-    apiKey: string;
-    model: string;
-  };
-  qwen?: {
-    apiKey: string;
-    model: string;
-  };
-  qdrant?: {
-    url: string;
-    collection: string;
-  };
-  embedding?: {
-    model: 'ollama' | 'openai' | 'local';
-    dimension: number;
-  };
-}
-
-export interface EmbeddingResult {
-  repoId: number;
-  embedding: number[];
-  text: string;
-}
-
-export interface SearchResult {
-  repo: any;
-  similarity: number;
-  reasoning?: string;
-}
-
-export interface AISearchOptions {
-  query: string;
-  mode: 'semantic' | 'keyword' | 'hybrid';
-  limit?: number;
-  filters?: GetReposOptions;
-}
-
-export interface RecommendationResult {
-  repo: any;
-  score: number;
-  reasons: string[];
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  metadata?: Record<string, any>;
-}
-
-export interface ChatContext {
-  history: ChatMessage[];
-  repoContext?: any[];
-}
-
-export interface AIAnalysisResult {
-  category: string;
-  tags: string[];
-  confidence: number;
-  reasoning: string;
-  summary?: string;
-}
-
-export interface EmbeddingTaskStatus {
-  id: number;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  progress: number;
-  total: number;
-  error?: string;
 }
