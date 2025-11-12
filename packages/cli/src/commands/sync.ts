@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { getStarManager } from '@star-man/core';
+import { StarManager, loadConfig } from '@star-man/core';
 
 export function createSyncCommand(): Command {
   const command = new Command('sync');
@@ -9,8 +9,12 @@ export function createSyncCommand(): Command {
     .description('同步 GitHub star 仓库')
     .option('-f, --full', '执行全量同步（默认为增量同步）')
     .action(async (options) => {
+      let starManager: StarManager | null = null;
+
       try {
-        const starManager = await getStarManager();
+        const config = loadConfig();
+        starManager = new StarManager(config);
+        await starManager.initialize();
 
         console.log(chalk.blue('开始同步 GitHub star 仓库...'));
 
@@ -32,7 +36,6 @@ export function createSyncCommand(): Command {
 
         console.log(chalk.green('\n✅ 同步完成！'));
         console.log(`新增仓库: ${chalk.yellow(result.added)}`);
-
         console.log(`标记为取消 star: ${chalk.yellow(result.unstarred)}`);
         console.log(`当前 Star 数（已标记为 Star）: ${chalk.yellow(result.total)}`);
         console.log(`数据库记录总数（含已取消 Star）: ${chalk.yellow(result.dbTotal)}`);
@@ -40,6 +43,10 @@ export function createSyncCommand(): Command {
       } catch (error) {
         console.error(chalk.red('同步失败:'), error instanceof Error ? error.message : error);
         process.exit(1);
+      } finally {
+        if (starManager) {
+          await starManager.close();
+        }
       }
     });
 
