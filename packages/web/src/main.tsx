@@ -11,7 +11,15 @@ import SyncPage from './pages/Sync.tsx'
 import TagsCloud from './pages/TagsCloud.tsx'
 import Categories from './pages/Categories.tsx'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: 'always', // 本地 API 开发，忽略浏览器网络状态
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 const rootRoute = createRootRoute({
   component: () => <App />,
