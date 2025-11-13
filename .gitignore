@@ -54,9 +54,20 @@ storybook-static/
 
 # Project data (only root level)
 /data/
+
+# SQLite database files
 *.db
 *.sqlite
 *.sqlite3
+
+# SQLite temporary and WAL files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Prevent accidental data commits in packages
+packages/*/data/
+packages/*/*.db*
 
 # vscode
 .history
