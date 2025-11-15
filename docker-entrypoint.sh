@@ -7,15 +7,19 @@ set -e
 echo "🚀 Star-Man 启动中..."
 
 # 检查必需的环境变量
-if [ -z "$GITHUB_TOKEN" ]; then
-  echo "❌ 错误: 未设置 GITHUB_TOKEN 环境变量"
-  echo "   请使用 docker run --env-file .env 或 -e GITHUB_TOKEN=xxx"
-  exit 1
-fi
+if [ -n "$GITHUB_TOKEN" ] && [ -n "$DATABASE_URL" ]; then
+  echo "✅ 环境变量已加载"
+else
+  if [ -z "$GITHUB_TOKEN" ]; then
+    echo "❌ 错误: 未设置 GITHUB_TOKEN 环境变量"
+    echo "   请使用 docker run --env-file .env 或 -e GITHUB_TOKEN=xxx"
+    exit 1
+  fi
 
-if [ -z "$DATABASE_URL" ]; then
-  echo "⚠️  警告: 未设置 DATABASE_URL，使用默认值"
-  export DATABASE_URL="./packages/data/star-man.db"
+  if [ -z "$DATABASE_URL" ]; then
+    echo "⚠️  警告: 未设置 DATABASE_URL，使用默认值"
+    export DATABASE_URL="./packages/data/star-man.db"
+  fi
 fi
 
 # 确保数据目录存在

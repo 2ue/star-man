@@ -6,31 +6,24 @@
 #   2. 运行: docker-compose up -d
 #   3. 查看日志: docker-compose logs -f
 #   4. 停止: docker-compose down
-# ============================================
-
-version: '3.8'
+# ===========================================
 
 services:
-  star-man-api:
+  star-man:
     image: huby11111/star-man:latest
     container_name: star-man
     restart: unless-stopped
     ports:
+      - "3800:3800"
       - "${API_PORT:-3801}:3801"
     volumes:
       # 持久化数据库文件
       - ./data:/app/data
     env_file:
       - .env
-    networks:
-      - star-man-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3801/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-networks:
-  star-man-network:
-    driver: bridge

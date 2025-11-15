@@ -6,6 +6,7 @@ services:
     container_name: star-man-api
     restart: unless-stopped
     ports:
+      - "3800:3800"
       - "${API_PORT:-3801}:3801"
     volumes:
       # 持久化数据库文件
