@@ -25,6 +25,13 @@ fi
 # 确保数据目录存在
 mkdir -p /app/packages/data
 
+# 自动执行数据库迁移（确保 schema 与数据库同步）
+echo "📦 检查数据库 schema..."
+cd /app/packages/core && npx prisma db push --accept-data-loss --skip-generate > /dev/null 2>&1 || {
+  echo "⚠️  数据库 schema 更新失败，但将继续启动"
+}
+cd /app
+
 # 后台启动 Express API
 echo "📡 启动 API 服务 (端口 3801)..."
 cd /app && node packages/api/dist/server.js &
