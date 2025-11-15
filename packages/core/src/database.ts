@@ -3,8 +3,10 @@ import { DatabaseConfig } from './types';
 import { execSync } from 'child_process';
 import { join, dirname } from 'path';
 import { ensureDirSync } from 'fs-extra';
+import { existsSync } from 'fs';
 
 export class Database {
+  private static syncedDatabases = new Set<string>();
   private prisma: PrismaClient;
   private config: DatabaseConfig;
 
@@ -24,16 +26,15 @@ export class Database {
       // ✅ 修复：在连接数据库前，确保 SQLite 文件的父目录存在
       this.ensureDatabaseDirectoryExists();
 
-      await this.prisma.$connect();
-
-      // 检查数据库表是否存在
-      const needsInit = await this.checkIfNeedsInitialization();
-
-      if (needsInit) {
-        console.log('📦 检测到数据库未初始化，正在自动创建表...');
-        await this.initializeSchema();
-        console.log('✅ 数据库初始化完成');
+      // 总是确保 schema 已同步（每个数据库 URL 只运行一次）
+      if (!Database.syncedDatabases.has(this.config.url)) {
+        console.log('📦 正在同步数据库 schema...');
+        this.syncSchema();
+        Database.syncedDatabases.add(this.config.url);
+        console.log('✅ 数据库 schema 已同步');
       }
+
+      await this.prisma.$connect();
     } catch (error) {
       throw new Error(`Failed to connect to database: ${error}`);
     }
@@ -60,39 +61,41 @@ export class Database {
   }
 
   /**
-   * 检查数据库是否需要初始化
-   * 通过尝试查询主表来判断
+   * 使用本地 Prisma CLI 同步数据库 Schema
    */
-  private async checkIfNeedsInitialization(): Promise<boolean> {
-    try {
-      // 尝试查询 starred_repos 表
-      await this.prisma.starredRepo.findFirst();
-      return false; // 表存在，不需要初始化
-    } catch (error) {
-      // 表不存在或查询失败，需要初始化
-      return true;
-    }
-  }
-
-  /**
-   * 初始化数据库Schema
-   * 使用 prisma db push 自动创建表
-   */
-  private async initializeSchema(): Promise<void> {
+  private syncSchema(): void {
     try {
       const schemaPath = join(__dirname, '../prisma/schema.prisma');
+      const prismaBinary = this.resolvePrismaBinary();
 
-      // 运行 prisma db push
-      execSync(`npx prisma db push --schema="${schemaPath}" --skip-generate`, {
+      execSync(`"${prismaBinary}" db push --schema="${schemaPath}" --skip-generate`, {
         env: {
           ...process.env,
           DATABASE_URL: this.config.url
         },
-        stdio: 'pipe' // 静默执行，只在出错时显示
+        stdio: 'inherit'
       });
     } catch (error) {
       throw new Error(`Failed to initialize database schema: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  /**
+   * 定位 Prisma CLI 的路径，避免依赖全局 npx
+   */
+  private resolvePrismaBinary(): string {
+    const binaryName = process.platform === 'win32' ? 'prisma.cmd' : 'prisma';
+    const localBinary = join(__dirname, '../node_modules/.bin', binaryName);
+    if (existsSync(localBinary)) {
+      return localBinary;
+    }
+
+    const workspaceBinary = join(process.cwd(), 'node_modules/.bin', binaryName);
+    if (existsSync(workspaceBinary)) {
+      return workspaceBinary;
+    }
+
+    throw new Error('Prisma CLI binary not found. Please install the "prisma" package.');
   }
 
   async close(): Promise<void> {
