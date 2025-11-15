@@ -67,7 +67,7 @@ function findEnvFile(): string | undefined {
 // 加载项目根目录的 .env 文件
 const envPath = findEnvFile();
 if (envPath) {
-  config({ path: envPath });
+  config({ path: envPath, override: true });
   // 调试信息（开发环境）
   if (process.env.DEBUG) {
     console.log(`📁 项目根目录: ${PROJECT_ROOT}`);

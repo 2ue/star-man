@@ -72,6 +72,15 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
 
+      # 更新 Docker Hub README
+      - name: 更新 Docker Hub README
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ env.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}
+          readme-filepath: ./README.md
+
       # 创建 GitHub Release
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v2

@@ -1,9 +1,19 @@
+# ============================================
+# Star-Man Docker Compose 示例配置
+# ============================================
+# 使用方法：
+#   1. 复制 .env.example 为 .env 并填写配置
+#   2. 运行: docker-compose up -d
+#   3. 查看日志: docker-compose logs -f
+#   4. 停止: docker-compose down
+# ============================================
+
 version: '3.8'
 
 services:
   star-man-api:
     image: huby11111/star-man:latest
-    container_name: star-man-api
+    container_name: star-man
     restart: unless-stopped
     ports:
       - "${API_PORT:-3801}:3801"
