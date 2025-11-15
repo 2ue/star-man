@@ -4,7 +4,10 @@
 
 set -e
 
-echo "🚀 Star-Man 启动中..."
+# 读取版本号
+VERSION=$(cat /app/package.json | grep '"version"' | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+
+echo "🚀 Star-Man 启动中... (v${VERSION})"
 
 # 检查必需的环境变量
 if [ -n "$GITHUB_TOKEN" ] && [ -n "$DATABASE_URL" ]; then
