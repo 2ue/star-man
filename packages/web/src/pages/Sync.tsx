@@ -1,11 +1,11 @@
 import { RefreshCw, Rocket, History, CheckCircle, XCircle, Clock, Play, AlertCircle } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { triggerSync, fetchSyncHistory } from '../lib/api'
+import { triggerSync, fetchSyncHistory, getAutoSyncConfig } from '../lib/api'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import Pagination from '../components/Pagination'
-import { AutoSyncConfig } from '../components/AutoSyncConfig'
+import { AutoSyncModal } from '../components/AutoSyncModal'
 
 // 设置dayjs中文语言包
 dayjs.locale('zh-cn')
@@ -15,7 +15,25 @@ export default function SyncPage() {
   const [syncType, setSyncType] = useState<'incremental' | 'full'>('incremental')
   const [historyPage, setHistoryPage] = useState(0)
   const [historyLimit, setHistoryLimit] = useState(10)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false)
+  const [autoSyncStatus, setAutoSyncStatus] = useState({ isRunning: false, isSyncing: false })
   const queryClient = useQueryClient()
+
+  // Load auto-sync status
+  useEffect(() => {
+    loadAutoSyncStatus()
+  }, [])
+
+  async function loadAutoSyncStatus() {
+    try {
+      const response = await getAutoSyncConfig()
+      setAutoSyncEnabled(response.data.config.enabled)
+      setAutoSyncStatus(response.data.status)
+    } catch (error) {
+      console.error('加载自动同步状态失败:', error)
+    }
+  }
 
   const { data: historyData, isLoading: historyLoading } = useQuery({
     queryKey: ['sync-history', historyPage, historyLimit],
@@ -102,8 +120,8 @@ export default function SyncPage() {
         </p>
       </div>
 
-      {/* 第一行: 同步类型选择 + 同步控制 + 自动同步 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* 第一行: 同步类型选择 + 同步控制 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* 同步类型选择 */}
         <div className="card-modern">
           <div className="card-compact">
@@ -195,17 +213,49 @@ export default function SyncPage() {
           </div>
         </div>
 
-        {/* 同步控制 */}
+        {/* 同步控制 + 自动同步 */}
         <div className="card-modern">
           <div className="card-compact">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <Play size={20} className="text-white" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Play size={20} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-800">执行同步</h2>
+                  <p className="text-xs text-gray-500">立即开始同步</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-800">执行同步</h2>
-                <p className="text-xs text-gray-500">立即开始同步</p>
-              </div>
+
+              {/* 自动同步状态 */}
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className={`relative overflow-hidden rounded-lg transition-all duration-300 px-3 py-2 ${
+                  autoSyncEnabled
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-lg hover:shadow-green-500/30'
+                    : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:shadow-md'
+                }`}
+                title="点击设置自动同步"
+              >
+                {autoSyncStatus.isRunning && (
+                  <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                )}
+                <div className="relative flex items-center gap-2">
+                  <Clock size={16} className="text-white" />
+                  <div className="text-left">
+                    <div className="text-white font-medium text-xs">自动同步</div>
+                    <div className="text-white/80 text-[10px]">
+                      {autoSyncStatus.isRunning
+                        ? autoSyncStatus.isSyncing ? '同步中' : '运行中'
+                        : autoSyncEnabled ? '已启用' : '已禁用'
+                      }
+                    </div>
+                  </div>
+                  {autoSyncStatus.isRunning && (
+                    <div className="w-2 h-2 bg-white rounded-full animate-ping absolute -top-0.5 -right-0.5" />
+                  )}
+                </div>
+              </button>
             </div>
 
             <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -255,9 +305,6 @@ export default function SyncPage() {
             </div>
           </div>
         </div>
-
-        {/* 自动同步配置 */}
-        <AutoSyncConfig />
       </div>
 
       {/* 第二行: 同步历史记录 */}
@@ -381,6 +428,13 @@ export default function SyncPage() {
           )}
         </div>
       </div>
+
+      {/* 自动同步设置弹窗 */}
+      <AutoSyncModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={loadAutoSyncStatus}
+      />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 {
   "name": "@star-man/cli",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "CLI for star-man GitHub star management",
   "type": "module",
   "main": "dist/index.js",
