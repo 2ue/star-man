@@ -10,7 +10,7 @@ export interface SyncExecutor {
 }
 
 export class SyncScheduler {
-  private task: cron.ScheduledTask | null = null;
+  private tasks: cron.ScheduledTask[] = [];
   private syncPromise: Promise<void> | null = null;
   private executor: SyncExecutor;
   private configService: ConfigService;
@@ -34,21 +34,38 @@ export class SyncScheduler {
     // 停止旧任务
     this.stop();
 
-    // 验证 cron 表达式
-    if (!cron.validate(config.cronExpr)) {
-      console.error(`❌ 无效的 cron 表达式: ${config.cronExpr}`);
+    // 解析多个 cron 表达式（支持逗号分隔）
+    const cronExprs = config.cronExpr
+      .split(',')
+      .map(expr => expr.trim())
+      .filter(expr => expr.length > 0);
+
+    if (cronExprs.length === 0) {
+      console.error('❌ 未配置有效的 cron 表达式');
+      return;
+    }
+
+    // 验证所有 cron 表达式
+    const invalidExprs = cronExprs.filter(expr => !cron.validate(expr));
+    if (invalidExprs.length > 0) {
+      console.error(`❌ 无效的 cron 表达式: ${invalidExprs.join(', ')}`);
       return;
     }
 
     console.log(`⏰ 启动自动同步`);
-    console.log(`   规则: ${config.cronExpr}`);
+    console.log(`   规则数量: ${cronExprs.length}`);
+    cronExprs.forEach((expr, index) => {
+      console.log(`   规则 ${index + 1}: ${expr}`);
+    });
     console.log(`   时区: ${config.timezone}`);
 
-    // 创建定时任务
-    this.task = cron.schedule(config.cronExpr, async () => {
-      await this.runSync();
-    }, {
-      timezone: config.timezone
+    // 为每个 cron 表达式创建定时任务
+    this.tasks = cronExprs.map(expr => {
+      return cron.schedule(expr, async () => {
+        await this.runSync();
+      }, {
+        timezone: config.timezone
+      });
     });
   }
 
@@ -56,9 +73,9 @@ export class SyncScheduler {
    * 停止定时任务
    */
   stop(): void {
-    if (this.task) {
-      this.task.stop();
-      this.task = null;
+    if (this.tasks.length > 0) {
+      this.tasks.forEach(task => task.stop());
+      this.tasks = [];
       console.log('⏹️  停止自动同步');
     }
   }
@@ -112,7 +129,7 @@ export class SyncScheduler {
    */
   getStatus() {
     return {
-      isRunning: this.task !== null,
+      isRunning: this.tasks.length > 0,
       isSyncing: this.syncPromise !== null
     };
   }

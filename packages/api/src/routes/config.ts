@@ -56,11 +56,24 @@ export function createConfigRouter(starManager: StarManager): Router {
           });
         }
 
-        // 验证 cron 表达式
-        if (!cron.validate(cronExpr)) {
+        // 验证 cron 表达式（支持逗号分隔的多个表达式）
+        const cronExprs = cronExpr
+          .split(',')
+          .map(expr => expr.trim())
+          .filter(expr => expr.length > 0);
+
+        if (cronExprs.length === 0) {
           return res.status(400).json({
             success: false,
-            error: `无效的 cron 表达式: ${cronExpr}`
+            error: '未提供有效的 cron 表达式'
+          });
+        }
+
+        const invalidExprs = cronExprs.filter(expr => !cron.validate(expr));
+        if (invalidExprs.length > 0) {
+          return res.status(400).json({
+            success: false,
+            error: `无效的 cron 表达式: ${invalidExprs.join(', ')}`
           });
         }
       }
