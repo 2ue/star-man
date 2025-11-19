@@ -1052,9 +1052,13 @@ API_HOST=localhost
 # 数据库中不存在配置时，才从这里读取
 # 后续通过 Web UI、API 或 CLI 修改配置
 # ========================================
-AUTO_SYNC_ENABLED=false              # 是否启用自动同步，默认 false
-AUTO_SYNC_CRON=0 2 * * *              # cron 表达式，默认每天凌晨 2 点
-AUTO_SYNC_TIMEZONE=Asia/Shanghai      # 时区，默认 Asia/Shanghai
+AUTO_SYNC_ENABLED=true               # 是否启用自动同步，未设置时默认 true
+AUTO_SYNC_CRON=0 2 * * *            # cron 表达式，默认每天凌晨 2 点
+AUTO_SYNC_TIMEZONE=Asia/Shanghai    # 时区，默认 Asia/Shanghai
+
+# 启动时自动同步（仅影响 API 启动时是否立即进行一次增量同步）
+# 未设置时默认 true
+AUTO_SYNC_ON_START=true
 ```
 
 ---

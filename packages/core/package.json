@@ -13,6 +13,9 @@
     "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.0",
+    "@langchain/openai": "^0.3.0",
+    "@langchain/ollama": "^0.1.0",
     "@octokit/rest": "^20.0.2",
     "@prisma/client": "^5.22.0",
     "dotenv": "^16.3.1",

@@ -1,10 +1,11 @@
-import { Menu, Settings } from 'lucide-react'
+import { Menu, Settings, Sparkles } from 'lucide-react'
 import { Outlet, Link, useLocation } from '@tanstack/react-router'
 
 export default function App() {
   const location = useLocation()
 
   const isActive = (path: string) => location.pathname === path
+    || location.pathname.startsWith(path + '/')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -83,6 +84,22 @@ export default function App() {
                 >
                   <div className={`w-2 h-2 rounded-full ${isActive('/repos') ? 'bg-blue-500' : 'bg-gray-400'}`} />
                   <span className="font-medium text-sm">仓库</span>
+                </Link>
+
+                <Link
+                  to="/ai"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isActive('/ai')
+                      ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-700'
+                      : 'text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="AI 语义搜索"
+                >
+                  <div className={`w-2 h-2 rounded-full ${isActive('/ai') ? 'bg-purple-500' : 'bg-gray-400'}`} />
+                  <span className="font-medium text-sm flex items-center gap-1">
+                    <Sparkles size={13} />
+                    AI 搜索
+                  </span>
                 </Link>
 
                 <Link

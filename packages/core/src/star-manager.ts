@@ -49,12 +49,12 @@ export class StarManager implements SyncExecutor {
         select: { fullName: true }
       });
 
-      const existingStarredSet = new Set(
-        existingStarredRepos.map((repo: any) => repo.fullName)
+      const existingStarredSet = new Set<string>(
+        existingStarredRepos.map((repo: any) => repo.fullName as string)
       );
 
       // GitHub 上当前 starred 的仓库（集合A）
-      const currentStarredSet = new Set(repos.map(repo => repo.full_name));
+      const currentStarredSet = new Set<string>(repos.map(repo => repo.full_name as string));
 
       // 计算差集
       const newStarredRepos = repos.filter(repo => !existingStarredSet.has(repo.full_name)); // A - B
@@ -403,6 +403,52 @@ export class StarManager implements SyncExecutor {
         tags: repo.tags ? JSON.parse(repo.tags) : []
       })),
       total: tags && tags.length > 0 ? filteredRepos.length : total
+    };
+  }
+
+  /**
+   * 根据 fullName 列表批量查询哪些仓库已被标记为 isStarred。
+   * 用于全网搜索结果与本地记录的对齐。
+   */
+  async getStarredStatusByFullNames(fullNames: string[]): Promise<Record<string, boolean>> {
+    const prisma = this.db.getPrisma();
+    const result: Record<string, boolean> = {};
+
+    const uniqueNames = Array.from(new Set(fullNames.filter(name => !!name)));
+    if (uniqueNames.length === 0) {
+      return result;
+    }
+
+    const rows = await prisma.starredRepo.findMany({
+      where: { fullName: { in: uniqueNames } },
+      select: { fullName: true, isStarred: true }
+    });
+
+    for (const row of rows) {
+      result[row.fullName] = row.isStarred;
+    }
+
+    return result;
+  }
+
+  /**
+   * 根据仓库 id 获取单个仓库的详细信息（包含解析后的 topics 与 tags）。
+   * 主要供 AI 分析使用。
+   */
+  async getRepoById(id: number): Promise<any | null> {
+    const prisma = this.db.getPrisma();
+    const repo = await prisma.starredRepo.findUnique({
+      where: { id }
+    });
+
+    if (!repo) {
+      return null;
+    }
+
+    return {
+      ...repo,
+      topics: repo.topics ? JSON.parse(repo.topics) : [],
+      tags: repo.tags ? JSON.parse(repo.tags) : []
     };
   }
 

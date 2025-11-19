@@ -146,6 +146,21 @@ export class GitHubService {
     }
   }
 
+  async searchRepos(query: string, perPage: number = 30): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.rest.search.repos({
+        q: query,
+        sort: 'stars',
+        order: 'desc',
+        per_page: perPage,
+      });
+      return data.items ?? [];
+    } catch (error) {
+      console.error(`Error searching repositories with query "${query}":`, error);
+      throw error;
+    }
+  }
+
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }

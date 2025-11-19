@@ -43,6 +43,8 @@ export interface Repo {
   language: string
   category: string
   tags: string[]
+   // 可选的 topics，用于详情页展示
+  topics?: string[]
   stargazersCount: number
   forksCount: number
   htmlUrl: string
@@ -121,4 +123,42 @@ export interface SyncHistoryResponse {
   success: boolean
   data: SyncHistory[]
   total: number
-} 
+}
+
+// AI 语义搜索与分析
+export type AIScope = 'starred' | 'github' | 'both'
+
+export type AIReliability = 'high' | 'medium' | 'low'
+
+export interface AISearchResultItem {
+  fullName: string
+  name: string
+  description?: string
+  language?: string
+  stars: number
+  forks: number
+  htmlUrl: string
+  source: 'starred' | 'github'
+  isStarred: boolean
+  reliability: AIReliability
+  score: number
+  reason: string
+}
+
+export interface AISearchResponse {
+  success: boolean
+  data?: {
+    results: AISearchResultItem[]
+  }
+  error?: string
+}
+
+export interface AIClassifyResponse {
+  success: boolean
+  data?: {
+    category: string
+    tags: string[]
+    summary: string
+  }
+  error?: string
+}

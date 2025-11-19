@@ -19,8 +19,9 @@ export class ConfigService {
     });
 
     if (!existing) {
-      // 从环境变量读取初始值
-      const enabled = process.env.AUTO_SYNC_ENABLED === 'true';
+      // 从环境变量读取初始值，如果未设置则默认开启自动同步
+      const enabledEnv = process.env.AUTO_SYNC_ENABLED;
+      const enabled = enabledEnv === undefined ? true : enabledEnv === 'true';
       const cronExpr = process.env.AUTO_SYNC_CRON || '0 2 * * *';
       const timezone = process.env.AUTO_SYNC_TIMEZONE || 'Asia/Shanghai';
 

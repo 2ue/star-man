@@ -5,6 +5,38 @@ import { StarManager } from '@star-man/core';
 export function createReposRouter(starManager: StarManager): Router {
   const router = Router();
 
+  // 获取单个仓库详情
+  router.get('/:id', [
+    param('id').isInt().toInt(),
+  ], async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const repoId = Number(req.params.id);
+      const repo = await starManager.getRepoById(repoId);
+
+      if (!repo) {
+        return res.status(404).json({
+          success: false,
+          error: 'Repository not found',
+        });
+      }
+
+      return res.json({
+        success: true,
+        data: repo,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
   // 获取仓库列表
   router.get('/', [
     query('category').optional().isString(),

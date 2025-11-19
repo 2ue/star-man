@@ -1,10 +1,10 @@
-import { Search, Grid, List, Star, GitFork, ExternalLink, Tag, FolderOpen, SlidersHorizontal } from 'lucide-react'
+import { Search, Grid, List, Star, GitFork, ExternalLink, Tag, FolderOpen, SlidersHorizontal, FileText } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchRepos } from '../lib/api'
 import type { RepoQuery, RepoFilters } from '../types/api'
 import Pagination from '../components/Pagination'
-import { useSearch } from '@tanstack/react-router'
+import { useSearch, Link } from '@tanstack/react-router'
 import tippy from 'tippy.js'
 
 // 更多标签tooltip组件（使用tippy.js）
@@ -541,18 +541,39 @@ export default function Repos() {
                     }`}>
                     <div className={`${viewMode === 'list' ? 'flex-1' : ''}`}>
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className={`font-semibold text-gray-800 line-clamp-2 ${viewMode === 'list' ? 'text-base' : 'text-sm'
-                          }`}>
-                          {repo.name}
-                        </h3>
-                        <a
-                          href={repo.htmlUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-ghost btn-xs bg-white/50 hover:bg-white/70 border border-gray-200 flex-shrink-0"
-                        >
-                          <ExternalLink size={12} />
-                        </a>
+                        <div className="flex flex-col gap-1">
+                          <Link
+                            to="/repos/$repoId"
+                            params={{ repoId: repo.id.toString() }}
+                            className={`font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 ${viewMode === 'list' ? 'text-base' : 'text-sm'
+                              }`}
+                          >
+                            {repo.name}
+                          </Link>
+                          <div className="text-[11px] text-gray-500 line-clamp-1">
+                            {repo.fullName}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Link
+                            to="/repos/$repoId"
+                            params={{ repoId: repo.id.toString() }}
+                            className="btn btn-ghost btn-xxs bg-white/60 hover:bg-white border border-gray-200 flex items-center gap-1"
+                            title="查看详情 / AI 总结"
+                          >
+                            <FileText size={11} />
+                            <span className="text-[11px]">详情</span>
+                          </Link>
+                          <a
+                            href={repo.htmlUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-ghost btn-xs bg-white/50 hover:bg-white/70 border border-gray-200 flex-shrink-0"
+                            title="打开 GitHub"
+                          >
+                            <ExternalLink size={12} />
+                          </a>
+                        </div>
                       </div>
 
                       <p className="text-xs text-gray-600 line-clamp-2 mb-3">

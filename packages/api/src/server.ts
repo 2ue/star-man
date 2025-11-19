@@ -9,6 +9,7 @@ import { createSyncRouter } from './routes/sync';
 import { createUnstarRoutes } from './routes/unstar';
 import { createConfigRouter } from './routes/config';
 import statsRouter from './routes/stats';
+import { createAIRouter } from './routes/ai';
 
 // 检查工作目录（仅在非 CI 环境）
 if (!process.env.CI) {
@@ -137,6 +138,22 @@ async function startServer() {
     const starManager = new StarManager(config);
     await starManager.initialize();
 
+    // 启动时自动同步（可通过环境变量关闭）
+    const autoSyncOnStartEnv = process.env.AUTO_SYNC_ON_START;
+    const autoSyncOnStart = autoSyncOnStartEnv === undefined ? true : autoSyncOnStartEnv === 'true';
+
+    if (autoSyncOnStart) {
+      console.log('🚀 启动时自动同步已开启，将在后台执行一次增量同步...');
+      // 后台执行，同步过程中不阻塞 API 启动
+      starManager.syncStarredRepos(true).then(result => {
+        console.log('✅ 启动时自动同步完成:', result);
+      }).catch(error => {
+        console.error('❌ 启动时自动同步失败:', error);
+      });
+    } else {
+      console.log('⏭️ 已禁用启动时自动同步（AUTO_SYNC_ON_START=false）');
+    }
+
     // 启动定时同步调度器
     await starManager.startScheduler();
 
@@ -146,6 +163,7 @@ async function startServer() {
     app.use('/api/unstar', createUnstarRoutes(starManager));
     app.use('/api/stats', statsRouter);
     app.use('/api/config', createConfigRouter(starManager));
+    app.use('/api/ai', createAIRouter(starManager, config.github.token));
 
     // Swagger 文档
     const swaggerDocument = createSwaggerDocument('localhost', PORT);

@@ -4,7 +4,10 @@ import type {
   ReposResponse,
   RepoQuery,
   SyncResponse,
-  SyncHistoryResponse
+  SyncHistoryResponse,
+  Repo,
+  AISearchResponse,
+  AIClassifyResponse
 } from '../types/api'
 
 // 开发环境下使用相对路径走 Vite 代理，生产环境使用完整 URL
@@ -57,6 +60,31 @@ export const fetchStats = async (): Promise<Stats> => {
 export const fetchRepos = async (query: RepoQuery = {}): Promise<ReposResponse> => {
   const response = await http.get<ReposResponse>('/api/repos', { params: query })
   return response.data
+}
+
+// 获取单个仓库详情
+export const fetchRepoById = async (id: number): Promise<Repo> => {
+  const response = await http.get<{ success: boolean; data: any; error?: string }>(`/api/repos/${id}`)
+  if (!response.data.success) {
+    throw new Error(response.data.error || '加载仓库详情失败')
+  }
+  const raw = response.data.data
+
+  return {
+    id: raw.id,
+    name: raw.name,
+    fullName: raw.fullName,
+    description: raw.description ?? '',
+    language: raw.language ?? '',
+    category: raw.category ?? '',
+    tags: raw.tags ?? [],
+    topics: raw.topics ?? [],
+    stargazersCount: raw.stargazersCount ?? 0,
+    forksCount: raw.forksCount ?? 0,
+    htmlUrl: raw.htmlUrl,
+    createdAt: raw.createdAt,
+    updatedAt: raw.updatedAt,
+  }
 }
 
 // 触发同步 - 使用配置的同步超时时间
@@ -113,5 +141,21 @@ export const updateAutoSyncConfig = async (data: {
   timezone?: string
 }) => {
   const response = await http.put('/api/config/auto-sync', data)
+  return response.data
+}
+
+// AI 语义搜索
+export const aiSearch = async (payload: {
+  query: string
+  scope?: 'starred' | 'github' | 'both'
+  limit?: number
+}): Promise<AISearchResponse> => {
+  const response = await http.post<AISearchResponse>('/api/ai/search', payload)
+  return response.data
+}
+
+// AI 仓库分类与总结
+export const aiClassifyRepo = async (repoId: number): Promise<AIClassifyResponse> => {
+  const response = await http.post<AIClassifyResponse>('/api/ai/classify', { repoId })
   return response.data
 }

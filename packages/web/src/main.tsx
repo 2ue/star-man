@@ -7,9 +7,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRootRoute, createRoute, createRouter, RouterProvider } from '@tanstack/react-router'
 import Dashboard from './pages/Dashboard.tsx'
 import Repos from './pages/Repos.tsx'
+import RepoDetailPage from './pages/RepoDetail.tsx'
 import SyncPage from './pages/Sync.tsx'
 import TagsCloud from './pages/TagsCloud.tsx'
 import Categories from './pages/Categories.tsx'
+import AISearchPage from './pages/AISearch.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +39,12 @@ const reposRoute = createRoute({
   component: () => <Repos />,
 })
 
+const repoDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'repos/$repoId',
+  component: () => <RepoDetailPage />,
+})
+
 const syncRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'sync',
@@ -55,7 +63,21 @@ const categoriesRoute = createRoute({
   component: () => <Categories />,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, reposRoute, syncRoute, tagsRoute, categoriesRoute])
+const aiSearchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'ai',
+  component: () => <AISearchPage />,
+})
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  reposRoute,
+  repoDetailRoute,
+  syncRoute,
+  tagsRoute,
+  categoriesRoute,
+  aiSearchRoute,
+])
 const router = createRouter({ routeTree })
 
 declare module '@tanstack/react-router' {
